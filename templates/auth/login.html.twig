@@ -290,6 +290,8 @@
 </div>
 
 <script>
+(function() {
+    // Réinitialiser complètement au chargement
     const comboDisplay = document.getElementById('comboDisplay');
     const comboSecret = document.getElementById('comboSecret');
     const comboStatus = document.getElementById('comboStatus');
@@ -301,6 +303,15 @@
     let comboKeys = [];
     let attempts = 0;
     let isComboActive = false;
+    
+    // Nettoyer les anciens event listeners en clonant les éléments
+    const newComboDisplay = comboDisplay.cloneNode(true);
+    comboDisplay.parentNode.replaceChild(newComboDisplay, comboDisplay);
+    const comboDisplayClean = document.getElementById('comboDisplay');
+    
+    const newResetBtn = resetBtn.cloneNode(true);
+    resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+    const resetBtnClean = document.getElementById('resetCombo');
     
     // Touches autorisées
     const allowedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'u', 'U', 'i', 'I', 'j', 'J', 'k', 'K'];
@@ -322,25 +333,25 @@
     };
     
     // Activer la zone combo au clic
-    comboDisplay.addEventListener('click', () => {
-        comboDisplay.focus();
+    comboDisplayClean.addEventListener('click', () => {
+        comboDisplayClean.focus();
     });
     
     // Quand la zone est focus, activer l'enregistrement
-    comboDisplay.addEventListener('focus', () => {
+    comboDisplayClean.addEventListener('focus', () => {
         isComboActive = true;
         if (comboKeys.length === 0) {
-            comboDisplay.innerHTML = '<span style="opacity: 0.5;">✍️ Tapez votre combo...</span>';
+            comboDisplayClean.innerHTML = '<span style="opacity: 0.5;">✍️ Tapez votre combo...</span>';
         }
     });
     
     // Quand on perd le focus, désactiver
-    comboDisplay.addEventListener('blur', () => {
+    comboDisplayClean.addEventListener('blur', () => {
         isComboActive = false;
     });
     
     // Écouter les touches seulement si la zone est active
-    comboDisplay.addEventListener('keydown', (e) => {
+    comboDisplayClean.addEventListener('keydown', (e) => {
         if (!isComboActive) return;
         
         const key = e.key;
@@ -349,9 +360,9 @@
         if (!allowedKeys.includes(key)) {
             e.preventDefault();
             // Flash rouge pour indiquer touche non autorisée
-            comboDisplay.style.borderColor = '#f00';
+            comboDisplayClean.style.borderColor = '#f00';
             setTimeout(() => {
-                comboDisplay.style.borderColor = '#0ff';
+                comboDisplayClean.style.borderColor = '#0ff';
             }, 200);
             return;
         }
@@ -365,14 +376,14 @@
         const displayKey = keyMap[key] || key.toUpperCase();
         
         if (comboKeys.length === 1) {
-            comboDisplay.innerHTML = '';
-            comboDisplay.classList.remove('correct', 'incorrect');
+            comboDisplayClean.innerHTML = '';
+            comboDisplayClean.classList.remove('correct', 'incorrect');
         }
         
         const keyIcon = document.createElement('div');
         keyIcon.className = 'key-icon';
         keyIcon.textContent = displayKey;
-        comboDisplay.appendChild(keyIcon);
+        comboDisplayClean.appendChild(keyIcon);
         
         // Mettre à jour le champ caché
         comboSecret.value = comboKeys.join(',');
@@ -389,19 +400,19 @@
     });
     
     // Bouton de réinitialisation
-    resetBtn.addEventListener('click', () => {
+    resetBtnClean.addEventListener('click', () => {
         resetCombo();
     });
     
     function resetCombo() {
         comboKeys = [];
-        comboDisplay.innerHTML = '<span style="opacity: 0.5;">👆 Cliquez ici puis tapez votre combo...</span>';
+        comboDisplayClean.innerHTML = '<span style="opacity: 0.5;">👆 Cliquez ici puis tapez votre combo...</span>';
         comboSecret.value = '';
         submitBtn.disabled = true;
         comboStatus.textContent = '';
-        comboDisplay.classList.remove('correct', 'incorrect');
+        comboDisplayClean.classList.remove('correct', 'incorrect');
         updateCounter();
-        comboDisplay.blur();
+        comboDisplayClean.blur();
         isComboActive = false;
     }
     
@@ -438,7 +449,7 @@
             const data = await response.json();
             
             if (data.success) {
-                comboDisplay.classList.add('correct');
+                comboDisplayClean.classList.add('correct');
                 comboStatus.textContent = '✅ COMBO CORRECT !';
                 comboStatus.style.color = '#0f0';
                 showMessage('✅ ' + data.message, 'success');
@@ -446,7 +457,7 @@
                     window.location.href = data.redirect;
                 }, 1500);
             } else {
-                comboDisplay.classList.add('incorrect');
+                comboDisplayClean.classList.add('incorrect');
                 comboStatus.textContent = '❌ COMBO INCORRECT !';
                 comboStatus.style.color = '#f00';
                 showMessage('❌ ' + data.message, 'error');
@@ -455,12 +466,12 @@
                 // Réinitialiser après 2 secondes
                 setTimeout(() => {
                     comboKeys = [];
-                    comboDisplay.innerHTML = '<span style="opacity: 0.5;">Réessayez...</span>';
+                    comboDisplayClean.innerHTML = '<span style="opacity: 0.5;">Réessayez...</span>';
                     comboSecret.value = '';
                     submitBtn.disabled = true;
                     submitBtn.textContent = '🔓 Se connecter';
                     comboStatus.textContent = '';
-                    comboDisplay.classList.remove('incorrect');
+                    comboDisplayClean.classList.remove('incorrect');
                 }, 2000);
             }
         } catch (error) {
@@ -475,5 +486,6 @@
         message.className = 'message ' + type;
         message.style.display = 'block';
     }
+})();
 </script>
 {% endblock %}
