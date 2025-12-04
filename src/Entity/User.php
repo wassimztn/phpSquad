@@ -32,9 +32,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $comboSecret = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+    
+    public function getComboSecret(): ?string
+    {
+        return $this->comboSecret;
+    }
+
+    public function setComboSecret(?string $comboSecret): static
+    {
+        $this->comboSecret = $comboSecret;
+        return $this;
     }
 
     public function getEmail(): ?string

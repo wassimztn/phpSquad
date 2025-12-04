@@ -56,6 +56,44 @@ header .nav-links a:hover {
     color: #3498db;
 }
 
+/* Bouton Auth spécial */
+header .nav-links .btn-auth {
+    background: linear-gradient(135deg, #0f9999 0%, #0d7a7a 100%);
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    border: 2px solid #0f0;
+    color: #fff !important;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    box-shadow: 
+        0 0 15px rgba(0, 255, 0, 0.4),
+        inset 0 0 10px rgba(0, 255, 0, 0.1);
+    transition: all 0.3s ease;
+    animation: authPulse 2s infinite;
+}
+
+header .nav-links .btn-auth:hover {
+    background: linear-gradient(135deg, #0d7a7a 0%, #0f9999 100%);
+    box-shadow: 
+        0 0 25px rgba(0, 255, 0, 0.7),
+        inset 0 0 15px rgba(0, 255, 0, 0.2);
+    transform: translateY(-2px);
+    color: #fff !important;
+}
+
+@keyframes authPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 15px rgba(0, 255, 0, 0.4),
+            inset 0 0 10px rgba(0, 255, 0, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 25px rgba(0, 255, 0, 0.6),
+            inset 0 0 15px rgba(0, 255, 0, 0.15);
+    }
+}
+
 /* Main content */
 main {
     flex: 1;

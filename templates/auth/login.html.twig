@@ -1,0 +1,479 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Combo Gaming{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f1b3c 100%);
+            background-attachment: fixed;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 100, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .auth-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .auth-box {
+            background: rgba(0, 20, 0, 0.95);
+            border: 3px solid #0f0;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 0, 0.5),
+                inset 0 0 20px rgba(0, 255, 0, 0.05);
+        }
+        .auth-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #0f0;
+        }
+        .auth-subtitle {
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 50, 0, 0.5);
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        .combo-display {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            padding: 20px;
+            min-height: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .combo-display:hover {
+            border-color: #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+        .combo-display:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+            animation: focusPulse 1.5s infinite;
+        }
+        @keyframes focusPulse {
+            0%, 100% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.6); }
+            50% { box-shadow: 0 0 35px rgba(0, 255, 255, 0.9); }
+        }
+        .combo-display.correct {
+            border-color: #0f0;
+            animation: correctPulse 0.5s ease;
+        }
+        .combo-display.incorrect {
+            border-color: #f00;
+            animation: shake 0.5s ease;
+        }
+        @keyframes correctPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 0, 1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .combo-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            gap: 10px;
+        }
+        .btn-reset {
+            background: rgba(255, 100, 100, 0.2);
+            border: 2px solid #f00;
+            border-radius: 5px;
+            padding: 8px 15px;
+            color: #f00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-reset:hover {
+            background: rgba(255, 100, 100, 0.4);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+            transform: scale(1.05);
+        }
+        .combo-counter {
+            color: #0f0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .key-icon {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            animation: keyPop 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        @keyframes keyPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .combo-hint {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .combo-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #0f9999 0%, #0d7a7a 100%);
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #0d7a7a 0%, #0f9999 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+            transform: translateY(-2px);
+        }
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        .message.success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #0f0;
+        }
+        .message.error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #f00;
+            color: #f00;
+        }
+        .link-register {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .link-register a {
+            color: #0f0;
+            text-decoration: none;
+            border-bottom: 1px solid #0f0;
+        }
+        .link-register a:hover {
+            text-shadow: 0 0 10px #0f0;
+        }
+        .attempts-counter {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1 class="auth-title">🎮 CONNEXION</h1>
+        <p class="auth-subtitle">Entrez votre combo secret !</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">📧 Email</label>
+                <input type="email" class="form-input" id="email" placeholder="votre@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">🎮 Votre Combo Secret</label>
+                <div class="combo-display" id="comboDisplay" tabindex="0">
+                    <span style="opacity: 0.5;">👆 Cliquez ici puis tapez votre combo...</span>
+                </div>
+                <div class="combo-controls">
+                    <button type="button" class="btn-reset" id="resetCombo">🔄 Réinitialiser</button>
+                    <span class="combo-counter" id="comboCounter">0 touches</span>
+                </div>
+                <div class="combo-hint">
+                    💡 Touches : ↑ ↓ ← → U I J K uniquement
+                </div>
+                <div class="combo-status" id="comboStatus"></div>
+                <input type="hidden" id="comboSecret" required>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                🔓 Se connecter
+            </button>
+        </form>
+        
+        <div class="message" id="message"></div>
+        <div class="attempts-counter" id="attempts"></div>
+        
+        <div class="link-register">
+            Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const comboDisplay = document.getElementById('comboDisplay');
+    const comboSecret = document.getElementById('comboSecret');
+    const comboStatus = document.getElementById('comboStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('message');
+    const attemptsDisplay = document.getElementById('attempts');
+    const resetBtn = document.getElementById('resetCombo');
+    const comboCounter = document.getElementById('comboCounter');
+    let comboKeys = [];
+    let attempts = 0;
+    let isComboActive = false;
+    
+    // Touches autorisées
+    const allowedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'u', 'U', 'i', 'I', 'j', 'J', 'k', 'K'];
+    
+    // Map des touches pour affichage visuel
+    const keyMap = {
+        'ArrowUp': '↑',
+        'ArrowDown': '↓',
+        'ArrowLeft': '←',
+        'ArrowRight': '→',
+        'u': 'U',
+        'U': 'U',
+        'i': 'I',
+        'I': 'I',
+        'j': 'J',
+        'J': 'J',
+        'k': 'K',
+        'K': 'K'
+    };
+    
+    // Activer la zone combo au clic
+    comboDisplay.addEventListener('click', () => {
+        comboDisplay.focus();
+    });
+    
+    // Quand la zone est focus, activer l'enregistrement
+    comboDisplay.addEventListener('focus', () => {
+        isComboActive = true;
+        if (comboKeys.length === 0) {
+            comboDisplay.innerHTML = '<span style="opacity: 0.5;">✍️ Tapez votre combo...</span>';
+        }
+    });
+    
+    // Quand on perd le focus, désactiver
+    comboDisplay.addEventListener('blur', () => {
+        isComboActive = false;
+    });
+    
+    // Écouter les touches seulement si la zone est active
+    comboDisplay.addEventListener('keydown', (e) => {
+        if (!isComboActive) return;
+        
+        const key = e.key;
+        
+        // Vérifier si la touche est autorisée
+        if (!allowedKeys.includes(key)) {
+            e.preventDefault();
+            // Flash rouge pour indiquer touche non autorisée
+            comboDisplay.style.borderColor = '#f00';
+            setTimeout(() => {
+                comboDisplay.style.borderColor = '#0ff';
+            }, 200);
+            return;
+        }
+        
+        // Empêcher le comportement par défaut
+        e.preventDefault();
+        
+        comboKeys.push(key);
+        
+        // Afficher la touche
+        const displayKey = keyMap[key] || key.toUpperCase();
+        
+        if (comboKeys.length === 1) {
+            comboDisplay.innerHTML = '';
+            comboDisplay.classList.remove('correct', 'incorrect');
+        }
+        
+        const keyIcon = document.createElement('div');
+        keyIcon.className = 'key-icon';
+        keyIcon.textContent = displayKey;
+        comboDisplay.appendChild(keyIcon);
+        
+        // Mettre à jour le champ caché
+        comboSecret.value = comboKeys.join(',');
+        
+        // Mettre à jour le compteur
+        updateCounter();
+        
+        // Activer le bouton si au moins 3 touches
+        if (comboKeys.length >= 3) {
+            submitBtn.disabled = false;
+            comboStatus.textContent = `${comboKeys.length} touches entrées`;
+            comboStatus.style.color = '#0f0';
+        }
+    });
+    
+    // Bouton de réinitialisation
+    resetBtn.addEventListener('click', () => {
+        resetCombo();
+    });
+    
+    function resetCombo() {
+        comboKeys = [];
+        comboDisplay.innerHTML = '<span style="opacity: 0.5;">👆 Cliquez ici puis tapez votre combo...</span>';
+        comboSecret.value = '';
+        submitBtn.disabled = true;
+        comboStatus.textContent = '';
+        comboDisplay.classList.remove('correct', 'incorrect');
+        updateCounter();
+        comboDisplay.blur();
+        isComboActive = false;
+    }
+    
+    function updateCounter() {
+        comboCounter.textContent = `${comboKeys.length} touches`;
+        comboCounter.style.color = '#0f0';
+    }
+    
+    // Gestion du formulaire
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const combo = comboSecret.value;
+        
+        if (!combo || comboKeys.length < 3) {
+            showMessage('Entrez votre combo complet !', 'error');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Vérification...';
+        attempts++;
+        
+        try {
+            const response = await fetch('{{ path('app_login_verify') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, combo })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                comboDisplay.classList.add('correct');
+                comboStatus.textContent = '✅ COMBO CORRECT !';
+                comboStatus.style.color = '#0f0';
+                showMessage('✅ ' + data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1500);
+            } else {
+                comboDisplay.classList.add('incorrect');
+                comboStatus.textContent = '❌ COMBO INCORRECT !';
+                comboStatus.style.color = '#f00';
+                showMessage('❌ ' + data.message, 'error');
+                attemptsDisplay.textContent = `Tentatives: ${attempts}`;
+                
+                // Réinitialiser après 2 secondes
+                setTimeout(() => {
+                    comboKeys = [];
+                    comboDisplay.innerHTML = '<span style="opacity: 0.5;">Réessayez...</span>';
+                    comboSecret.value = '';
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '🔓 Se connecter';
+                    comboStatus.textContent = '';
+                    comboDisplay.classList.remove('incorrect');
+                }, 2000);
+            }
+        } catch (error) {
+            showMessage('❌ Erreur de connexion au serveur', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🔓 Se connecter';
+        }
+    });
+    
+    function showMessage(text, type) {
+        message.textContent = text;
+        message.className = 'message ' + type;
+        message.style.display = 'block';
+    }
+</script>
+{% endblock %}

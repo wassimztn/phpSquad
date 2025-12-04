@@ -5,14 +5,16 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class GameController extends AbstractController
 {
     #[Route('/game/dataguardian', name: 'app_game')]
-    public function index(): Response
+    public function index(SessionInterface $session): Response
     {
         return $this->render('game/index.html.twig', [
             'controller_name' => 'GameController',
+            'user_email' => $session->get('user_email'),
         ]);
     }
 
