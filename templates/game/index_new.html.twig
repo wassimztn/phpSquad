@@ -1,0 +1,729 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Data Guardian - Fight the GAFAM!{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #0f0;
+        }
+        #game-canvas {
+            border: 3px solid #0f0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        .game-info {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(0, 20, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #0f0;
+            max-width: 800px;
+        }
+        .game-info h1 {
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            margin: 0 0 10px 0;
+        }
+        .game-info p {
+            margin: 5px 0;
+        }
+        .controls {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 50, 0, 0.5);
+            border: 1px solid #0f0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="game-container">
+    <div id="game-canvas"></div>
+    
+    <div class="game-info">
+        <h1>🛡️ DATA GUARDIAN 🛡️</h1>
+        <p>Protégez vos données contre les GAFAM à travers 5 niveaux !</p>
+        <div class="controls">
+            <strong>Contrôles:</strong><br>
+            ⬆️⬇️⬅️➡️ Flèches : Déplacement case par case<br>
+            💎 Coffres : Heal ou boost d'attaque<br>
+            ⚔️ Combat : Pierre-Feuille-Ciseaux cyber !
+        </div>
+        <p id="game-status">Chargement du jeu...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+    <script>
+        const Phaser = window.Phaser;
+        const TILE_SIZE = 32;
+        
+        // Configuration globale
+        const GameConfig = {
+            currentLevel: 1,
+            maxLevel: 5,
+            playerHealth: 100,
+            playerMaxHealth: 100,
+            playerData: 100,
+            attackBoost: false,
+            levels: [
+                { name: 'Silicon Valley', boss: 'Mark Zuckerberg', company: 'Meta' },
+                { name: 'Redmond Campus', boss: 'Bill Gates', company: 'Microsoft' },
+                { name: 'Seattle HQ', boss: 'Jeff Bezos', company: 'Amazon' },
+                { name: 'Apple Park', boss: 'Tim Cook', company: 'Apple' },
+                { name: 'Googleplex', boss: 'Sundar Pichai', company: 'Google' }
+            ]
+        };
+
+        // Boot Scene
+        class BootScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BootScene' });
+            }
+
+            preload() {
+                this.createSprites();
+            }
+
+            create() {
+                this.scene.start('MainScene');
+            }
+
+            createSprites() {
+                // Joueur
+                const playerGfx = this.add.graphics();
+                playerGfx.fillStyle(0x00ff00, 1);
+                playerGfx.fillCircle(16, 16, 12);
+                playerGfx.generateTexture('player', 32, 32);
+                playerGfx.destroy();
+
+                // Ennemis
+                const enemies = [
+                    { key: 'enemy_google', color: 0x4285F4 },
+                    { key: 'enemy_apple', color: 0xA3AAAE },
+                    { key: 'enemy_meta', color: 0x1877F2 },
+                    { key: 'enemy_amazon', color: 0xFF9900 },
+                    { key: 'enemy_microsoft', color: 0x00A4EF }
+                ];
+
+                enemies.forEach(enemy => {
+                    const gfx = this.add.graphics();
+                    gfx.fillStyle(enemy.color, 1);
+                    gfx.fillRect(4, 4, 24, 24);
+                    gfx.fillStyle(0x000000, 1);
+                    gfx.fillCircle(16, 16, 6);
+                    gfx.generateTexture(enemy.key, 32, 32);
+                    gfx.destroy();
+                });
+
+                // Boss (plus gros)
+                const bossGfx = this.add.graphics();
+                bossGfx.fillStyle(0xff0000, 1);
+                bossGfx.fillRect(0, 0, 32, 32);
+                bossGfx.fillStyle(0x000000, 1);
+                bossGfx.fillCircle(16, 16, 10);
+                bossGfx.fillStyle(0xff0000, 1);
+                bossGfx.fillCircle(16, 16, 6);
+                bossGfx.generateTexture('boss', 32, 32);
+                bossGfx.destroy();
+
+                // Coffre
+                const chestGfx = this.add.graphics();
+                chestGfx.fillStyle(0xFFD700, 1);
+                chestGfx.fillRect(8, 10, 16, 12);
+                chestGfx.fillStyle(0x8B4513, 1);
+                chestGfx.fillRect(10, 12, 12, 8);
+                chestGfx.generateTexture('chest', 32, 32);
+                chestGfx.destroy();
+
+                // Sol
+                const groundGfx = this.add.graphics();
+                groundGfx.fillStyle(0x2d3436, 1);
+                groundGfx.fillRect(0, 0, 32, 32);
+                groundGfx.lineStyle(1, 0x636e72, 0.3);
+                groundGfx.strokeRect(0, 0, 32, 32);
+                groundGfx.generateTexture('ground', 32, 32);
+                groundGfx.destroy();
+
+                // Mur
+                const wallGfx = this.add.graphics();
+                wallGfx.fillStyle(0x636e72, 1);
+                wallGfx.fillRect(0, 0, 32, 32);
+                wallGfx.lineStyle(2, 0x2d3436, 1);
+                wallGfx.strokeRect(2, 2, 28, 28);
+                wallGfx.generateTexture('wall', 32, 32);
+                wallGfx.destroy();
+            }
+        }
+
+        // Main Scene - Jeu au tour par tour
+        class MainScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'MainScene' });
+            }
+
+            create() {
+                this.gridSize = { width: 25, height: 18 };
+                this.canMove = true;
+                
+                this.createWorld();
+                this.createPlayer();
+                this.createEntities();
+                this.createUI();
+                this.setupInput();
+            }
+
+            createWorld() {
+                // Map avec obstacles
+                this.map = [];
+                for (let y = 0; y < this.gridSize.height; y++) {
+                    this.map[y] = [];
+                    for (let x = 0; x < this.gridSize.width; x++) {
+                        // Bordures
+                        if (x === 0 || x === this.gridSize.width - 1 || y === 0 || y === this.gridSize.height - 1) {
+                            this.map[y][x] = 'wall';
+                            this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, 'wall');
+                        } else {
+                            this.map[y][x] = 'ground';
+                            this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, 'ground');
+                        }
+                    }
+                }
+
+                // Ajouter obstacles internes
+                const obstacles = [
+                    {x: 5, y: 3, width: 2, height: 8},
+                    {x: 10, y: 6, width: 3, height: 5},
+                    {x: 18, y: 2, width: 2, height: 10},
+                    {x: 12, y: 10, width: 5, height: 2},
+                    {x: 3, y: 13, width: 8, height: 2}
+                ];
+
+                obstacles.forEach(obs => {
+                    for (let y = obs.y; y < obs.y + obs.height; y++) {
+                        for (let x = obs.x; x < obs.x + obs.width; x++) {
+                            if (y < this.gridSize.height && x < this.gridSize.width) {
+                                this.map[y][x] = 'wall';
+                                this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, 'wall');
+                            }
+                        }
+                    }
+                });
+            }
+
+            createPlayer() {
+                this.playerGrid = { x: 2, y: 2 };
+                this.player = this.add.sprite(
+                    this.playerGrid.x * TILE_SIZE + 16,
+                    this.playerGrid.y * TILE_SIZE + 16,
+                    'player'
+                ).setDepth(10);
+            }
+
+            createEntities() {
+                this.enemies = [];
+                this.chests = [];
+
+                // Ennemis normaux (3-4 par niveau)
+                const enemyTypes = ['enemy_google', 'enemy_apple', 'enemy_meta', 'enemy_amazon', 'enemy_microsoft'];
+                const enemyNames = ['Google Bot', 'Apple Tracker', 'Meta Spy', 'Amazon Crawler', 'MS Telemetry'];
+                
+                for (let i = 0; i < 4; i++) {
+                    const pos = this.findEmptyPosition();
+                    const idx = Phaser.Math.Between(0, 4);
+                    const enemy = this.add.sprite(pos.x * TILE_SIZE + 16, pos.y * TILE_SIZE + 16, enemyTypes[idx]);
+                    enemy.gridPos = pos;
+                    enemy.enemyName = enemyNames[idx];
+                    enemy.health = Phaser.Math.Between(40, 60);
+                    enemy.isBoss = false;
+                    this.enemies.push(enemy);
+                    this.map[pos.y][pos.x] = 'enemy';
+                }
+
+                // Boss du niveau
+                const levelData = GameConfig.levels[GameConfig.currentLevel - 1];
+                const bossPos = this.findEmptyPosition();
+                const boss = this.add.sprite(bossPos.x * TILE_SIZE + 16, bossPos.y * TILE_SIZE + 16, 'boss');
+                boss.setScale(1.5);
+                boss.gridPos = bossPos;
+                boss.enemyName = levelData.boss;
+                boss.company = levelData.company;
+                boss.health = 100;
+                boss.isBoss = true;
+                this.enemies.push(boss);
+                this.map[bossPos.y][bossPos.x] = 'boss';
+
+                // Coffres (2-3 par niveau)
+                for (let i = 0; i < 3; i++) {
+                    const pos = this.findEmptyPosition();
+                    const chest = this.add.sprite(pos.x * TILE_SIZE + 16, pos.y * TILE_SIZE + 16, 'chest');
+                    chest.gridPos = pos;
+                    chest.type = Phaser.Math.RND.pick(['heal', 'boost']);
+                    this.chests.push(chest);
+                    this.map[pos.y][pos.x] = 'chest';
+                }
+            }
+
+            findEmptyPosition() {
+                let x, y;
+                do {
+                    x = Phaser.Math.Between(2, this.gridSize.width - 3);
+                    y = Phaser.Math.Between(2, this.gridSize.height - 3);
+                } while (this.map[y][x] !== 'ground');
+                return { x, y };
+            }
+
+            createUI() {
+                const levelData = GameConfig.levels[GameConfig.currentLevel - 1];
+                
+                this.levelText = this.add.text(16, 16, `Niveau ${GameConfig.currentLevel}/5: ${levelData.name}`, {
+                    fontSize: '18px',
+                    fill: '#ff0',
+                    backgroundColor: '#000',
+                    padding: { x: 10, y: 5 }
+                }).setDepth(100);
+
+                this.healthText = this.add.text(16, 45, `❤️ ${GameConfig.playerHealth}/${GameConfig.playerMaxHealth}`, {
+                    fontSize: '20px',
+                    fill: '#0f0',
+                    backgroundColor: '#000',
+                    padding: { x: 10, y: 5 }
+                }).setDepth(100);
+
+                this.dataText = this.add.text(16, 75, `📊 Données: ${GameConfig.playerData}%`, {
+                    fontSize: '18px',
+                    fill: '#00f',
+                    backgroundColor: '#000',
+                    padding: { x: 10, y: 5 }
+                }).setDepth(100);
+
+                if (GameConfig.attackBoost) {
+                    this.boostText = this.add.text(16, 105, `⚡ BOOST ACTIF !`, {
+                        fontSize: '16px',
+                        fill: '#ff0',
+                        backgroundColor: '#000',
+                        padding: { x: 10, y: 5 }
+                    }).setDepth(100);
+                }
+            }
+
+            setupInput() {
+                this.input.keyboard.on('keydown-UP', () => this.movePlayer(0, -1));
+                this.input.keyboard.on('keydown-DOWN', () => this.movePlayer(0, 1));
+                this.input.keyboard.on('keydown-LEFT', () => this.movePlayer(-1, 0));
+                this.input.keyboard.on('keydown-RIGHT', () => this.movePlayer(1, 0));
+            }
+
+            movePlayer(dx, dy) {
+                if (!this.canMove) return;
+
+                const newX = this.playerGrid.x + dx;
+                const newY = this.playerGrid.y + dy;
+
+                if (newX < 0 || newX >= this.gridSize.width || newY < 0 || newY >= this.gridSize.height) return;
+
+                const tile = this.map[newY][newX];
+
+                if (tile === 'wall') return;
+
+                if (tile === 'enemy' || tile === 'boss') {
+                    const enemy = this.enemies.find(e => e.gridPos.x === newX && e.gridPos.y === newY);
+                    if (enemy) {
+                        this.startBattle(enemy);
+                    }
+                    return;
+                }
+
+                if (tile === 'chest') {
+                    const chest = this.chests.find(c => c.gridPos.x === newX && c.gridPos.y === newY);
+                    if (chest) {
+                        this.openChest(chest);
+                    }
+                    return;
+                }
+
+                // Déplacement valide
+                this.playerGrid.x = newX;
+                this.playerGrid.y = newY;
+
+                this.tweens.add({
+                    targets: this.player,
+                    x: newX * TILE_SIZE + 16,
+                    y: newY * TILE_SIZE + 16,
+                    duration: 150,
+                    ease: 'Power2'
+                });
+            }
+
+            openChest(chest) {
+                this.map[chest.gridPos.y][chest.gridPos.x] = 'ground';
+                
+                if (chest.type === 'heal') {
+                    const heal = 30;
+                    GameConfig.playerHealth = Math.min(GameConfig.playerMaxHealth, GameConfig.playerHealth + heal);
+                    this.showMessage(`💚 +${heal} PV !`);
+                } else {
+                    GameConfig.attackBoost = true;
+                    this.showMessage(`⚡ Boost d'attaque obtenu !`);
+                    if (!this.boostText) {
+                        this.boostText = this.add.text(16, 105, `⚡ BOOST ACTIF !`, {
+                            fontSize: '16px',
+                            fill: '#ff0',
+                            backgroundColor: '#000',
+                            padding: { x: 10, y: 5 }
+                        }).setDepth(100);
+                    }
+                }
+
+                this.healthText.setText(`❤️ ${GameConfig.playerHealth}/${GameConfig.playerMaxHealth}`);
+                chest.destroy();
+                this.chests = this.chests.filter(c => c !== chest);
+            }
+
+            showMessage(text) {
+                const msg = this.add.text(400, 300, text, {
+                    fontSize: '32px',
+                    fill: '#ff0',
+                    backgroundColor: '#000',
+                    padding: { x: 20, y: 10 }
+                }).setOrigin(0.5).setDepth(200);
+
+                this.tweens.add({
+                    targets: msg,
+                    alpha: 0,
+                    y: 250,
+                    duration: 1500,
+                    onComplete: () => msg.destroy()
+                });
+            }
+
+            startBattle(enemy) {
+                this.canMove = false;
+                this.scene.launch('BattleScene', {
+                    enemyName: enemy.enemyName,
+                    enemyCompany: enemy.company || '',
+                    enemyHealth: enemy.health,
+                    isBoss: enemy.isBoss,
+                    enemy: enemy
+                });
+                this.scene.pause();
+            }
+
+            endBattle(victory, enemy) {
+                if (victory) {
+                    this.map[enemy.gridPos.y][enemy.gridPos.x] = 'ground';
+                    enemy.destroy();
+                    this.enemies = this.enemies.filter(e => e !== enemy);
+
+                    // Vérifier si niveau terminé
+                    if (this.enemies.length === 0) {
+                        if (GameConfig.currentLevel < GameConfig.maxLevel) {
+                            this.nextLevel();
+                        } else {
+                            this.gameWon();
+                        }
+                    }
+                }
+
+                this.healthText.setText(`❤️ ${GameConfig.playerHealth}/${GameConfig.playerMaxHealth}`);
+                this.dataText.setText(`📊 Données: ${GameConfig.playerData}%`);
+                
+                this.canMove = true;
+            }
+
+            nextLevel() {
+                GameConfig.currentLevel++;
+                this.showMessage(`🎉 Niveau ${GameConfig.currentLevel - 1} terminé !`);
+                this.time.delayedCall(2000, () => {
+                    this.scene.restart();
+                });
+            }
+
+            gameWon() {
+                const winText = this.add.text(400, 300, '🎉 VICTOIRE TOTALE !\nVous avez protégé vos données !', {
+                    fontSize: '32px',
+                    fill: '#0f0',
+                    backgroundColor: '#000',
+                    padding: { x: 20, y: 10 },
+                    align: 'center'
+                }).setOrigin(0.5).setDepth(200);
+            }
+        }
+
+        // Battle Scene identique mais avec fix du bug undefined
+        class BattleScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BattleScene' });
+            }
+
+            init(data) {
+                this.enemyName = data.enemyName || 'Ennemi';
+                this.enemyCompany = data.enemyCompany || '';
+                this.enemyHealth = data.enemyHealth || 50;
+                this.isBoss = data.isBoss || false;
+                this.enemySprite = data.enemy;
+            }
+
+            create() {
+                this.playerChoice = null;
+                this.enemyChoice = null;
+                this.roundInProgress = false;
+
+                this.add.rectangle(400, 300, 800, 600, 0x000000, 0.9);
+
+                const title = this.isBoss 
+                    ? `💀 BOSS: ${this.enemyName.toUpperCase()} (${this.enemyCompany}) 💀`
+                    : `💻 COMBAT: ${this.enemyName.toUpperCase()} 💻`;
+
+                this.add.text(400, 40, title, {
+                    fontSize: this.isBoss ? '24px' : '28px',
+                    fill: this.isBoss ? '#ff0000' : '#f00',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+
+                this.add.text(150, 120, '👤 Vous', {
+                    fontSize: '24px',
+                    fill: '#0f0'
+                });
+
+                this.playerHealthBar = this.add.rectangle(150, 160, GameConfig.playerHealth * 2, 30, 0x00ff00);
+                this.playerHealthBar.setOrigin(0, 0.5);
+                this.playerHealthText = this.add.text(150, 185, `${GameConfig.playerHealth} PV`, {
+                    fontSize: '16px',
+                    fill: '#0f0'
+                });
+
+                this.add.text(550, 120, `🏢 ${this.enemyName}`, {
+                    fontSize: '24px',
+                    fill: '#f00'
+                });
+
+                this.enemyHealthBar = this.add.rectangle(550, 160, this.enemyHealth * 2, 30, 0xff0000);
+                this.enemyHealthBar.setOrigin(0, 0.5);
+                this.enemyHealthText = this.add.text(550, 185, `${this.enemyHealth} PV`, {
+                    fontSize: '16px',
+                    fill: '#f00'
+                });
+
+                this.dataText = this.add.text(400, 220, `📊 Vos données: ${GameConfig.playerData}%`, {
+                    fontSize: '20px',
+                    fill: '#00f'
+                }).setOrigin(0.5);
+
+                if (GameConfig.attackBoost) {
+                    this.add.text(400, 245, `⚡ BOOST ACTIF - Dégâts x1.5 !`, {
+                        fontSize: '16px',
+                        fill: '#ff0',
+                        backgroundColor: '#333',
+                        padding: { x: 10, y: 5 }
+                    }).setOrigin(0.5);
+                }
+
+                this.playerChoiceDisplay = this.add.text(200, 280, '', {
+                    fontSize: '48px'
+                }).setOrigin(0.5);
+
+                this.enemyChoiceDisplay = this.add.text(600, 280, '❓', {
+                    fontSize: '48px'
+                }).setOrigin(0.5);
+
+                this.battleLog = this.add.text(400, 350, `${this.enemyName} tente de pirater vos données !\nChoisissez votre défense cyber !`, {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: '#333',
+                    padding: { x: 20, y: 10 },
+                    align: 'center'
+                }).setOrigin(0.5);
+
+                this.createActionButtons();
+            }
+
+            createActionButtons() {
+                const buttonY = 480;
+                const buttonWidth = 200;
+                const buttonHeight = 80;
+
+                const firewallBtn = this.add.rectangle(150, buttonY, buttonWidth, buttonHeight, 0x0088ff);
+                this.add.text(150, buttonY - 15, '🔐 FIREWALL', {
+                    fontSize: '20px',
+                    fill: '#fff',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(150, buttonY + 15, 'Bloque les virus', {
+                    fontSize: '14px',
+                    fill: '#ccc'
+                }).setOrigin(0.5);
+
+                firewallBtn.setInteractive({ useHandCursor: true });
+                firewallBtn.on('pointerdown', () => this.makeChoice('firewall'));
+                firewallBtn.on('pointerover', () => firewallBtn.setFillStyle(0x00aaff));
+                firewallBtn.on('pointerout', () => firewallBtn.setFillStyle(0x0088ff));
+
+                const virusBtn = this.add.rectangle(400, buttonY, buttonWidth, buttonHeight, 0xff0000);
+                this.add.text(400, buttonY - 15, '🐛 VIRUS', {
+                    fontSize: '20px',
+                    fill: '#fff',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(400, buttonY + 15, 'Infecte le système', {
+                    fontSize: '14px',
+                    fill: '#ccc'
+                }).setOrigin(0.5);
+
+                virusBtn.setInteractive({ useHandCursor: true });
+                virusBtn.on('pointerdown', () => this.makeChoice('virus'));
+                virusBtn.on('pointerover', () => virusBtn.setFillStyle(0xff3333));
+                virusBtn.on('pointerout', () => virusBtn.setFillStyle(0xff0000));
+
+                const exploitBtn = this.add.rectangle(650, buttonY, buttonWidth, buttonHeight, 0x00ff00);
+                this.add.text(650, buttonY - 15, '💉 EXPLOIT', {
+                    fontSize: '20px',
+                    fill: '#000',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(650, buttonY + 15, 'Perce les défenses', {
+                    fontSize: '14px',
+                    fill: '#003300'
+                }).setOrigin(0.5);
+
+                exploitBtn.setInteractive({ useHandCursor: true });
+                exploitBtn.on('pointerdown', () => this.makeChoice('exploit'));
+                exploitBtn.on('pointerover', () => exploitBtn.setFillStyle(0x33ff33));
+                exploitBtn.on('pointerout', () => exploitBtn.setFillStyle(0x00ff00));
+            }
+
+            makeChoice(choice) {
+                if (this.roundInProgress) return;
+
+                this.roundInProgress = true;
+                this.playerChoice = choice;
+
+                const icons = { 'firewall': '🔐', 'virus': '🐛', 'exploit': '💉' };
+                this.playerChoiceDisplay.setText(icons[choice]);
+
+                const choices = ['firewall', 'virus', 'exploit'];
+                this.enemyChoice = Phaser.Math.RND.pick(choices);
+
+                this.battleLog.setText('Analyse en cours...');
+
+                this.time.delayedCall(1000, () => {
+                    this.enemyChoiceDisplay.setText(icons[this.enemyChoice]);
+                    this.resolveRound();
+                });
+            }
+
+            resolveRound() {
+                const p = this.playerChoice;
+                const e = this.enemyChoice;
+
+                let result = '';
+                let baseDamage = 20;
+                let damage = GameConfig.attackBoost ? Math.floor(baseDamage * 1.5) : baseDamage;
+                let dataLoss = 15;
+
+                if (p === e) {
+                    result = '⚖️ ÉGALITÉ ! Aucun dégât !';
+                } else if (
+                    (p === 'firewall' && e === 'virus') ||
+                    (p === 'virus' && e === 'exploit') ||
+                    (p === 'exploit' && e === 'firewall')
+                ) {
+                    this.enemyHealth -= damage;
+                    this.enemyHealthBar.setSize(Math.max(0, this.enemyHealth * 2), 30);
+                    this.enemyHealthText.setText(`${this.enemyHealth} PV`);
+
+                    const messages = {
+                        'firewall-virus': '🔐 Votre FIREWALL bloque le VIRUS !',
+                        'virus-exploit': '🐛 Votre VIRUS infecte l\'EXPLOIT !',
+                        'exploit-firewall': '💉 Votre EXPLOIT perce le FIREWALL !'
+                    };
+                    result = `✅ ${messages[`${p}-${e}`]}\n${this.enemyName} perd ${damage} PV !`;
+                    
+                    if (GameConfig.attackBoost) {
+                        result += '\n⚡ Boost utilisé !';
+                        GameConfig.attackBoost = false;
+                    }
+                } else {
+                    GameConfig.playerHealth -= damage;
+                    GameConfig.playerData -= dataLoss;
+                    this.playerHealthBar.setSize(Math.max(0, GameConfig.playerHealth * 2), 30);
+                    this.playerHealthText.setText(`${GameConfig.playerHealth} PV`);
+                    this.dataText.setText(`📊 Vos données: ${GameConfig.playerData}%`);
+
+                    const messages = {
+                        'firewall-exploit': `💉 L'EXPLOIT de ${this.enemyName} perce votre FIREWALL !`,
+                        'virus-firewall': `🔐 Le FIREWALL de ${this.enemyName} bloque votre VIRUS !`,
+                        'exploit-virus': `🐛 Le VIRUS de ${this.enemyName} infecte votre EXPLOIT !`
+                    };
+                    result = `❌ ${messages[`${e}-${p}`]}\nVous perdez ${damage} PV et ${dataLoss}% de données !`;
+                }
+
+                this.battleLog.setText(result);
+
+                this.time.delayedCall(2000, () => {
+                    if (this.enemyHealth <= 0) {
+                        this.victory();
+                    } else if (GameConfig.playerHealth <= 0 || GameConfig.playerData <= 0) {
+                        this.defeat();
+                    } else {
+                        this.playerChoiceDisplay.setText('');
+                        this.enemyChoiceDisplay.setText('❓');
+                        this.battleLog.setText(`Round suivant !\nChoisissez votre attaque cyber !`);
+                        this.roundInProgress = false;
+                    }
+                });
+            }
+
+            victory() {
+                const msg = this.isBoss ? `🎉 BOSS VAINCU ! ${this.enemyName} est défait !` : `✅ Victoire contre ${this.enemyName} !`;
+                this.battleLog.setText(msg);
+                this.time.delayedCall(2000, () => {
+                    this.returnToMainScene(true);
+                });
+            }
+
+            defeat() {
+                this.battleLog.setText('💀 DÉFAITE ! Game Over...');
+                this.time.delayedCall(3000, () => {
+                    location.reload();
+                });
+            }
+
+            returnToMainScene(victory) {
+                const mainScene = this.scene.get('MainScene');
+                this.scene.stop();
+                this.scene.resume('MainScene');
+                mainScene.endBattle(victory, this.enemySprite);
+            }
+        }
+
+        // Lancement du jeu
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-canvas',
+            backgroundColor: '#1a1a2e',
+            scene: [BootScene, MainScene, BattleScene]
+        };
+
+        console.log('Lancement de Data Guardian...');
+        const game = new Phaser.Game(config);
+        document.getElementById('game-status').textContent = 'Jeu chargé ! Utilisez les flèches pour vous déplacer case par case.';
+    </script>
+{% endblock %}

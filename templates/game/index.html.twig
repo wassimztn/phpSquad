@@ -1,0 +1,1505 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Data Guardian - Fight the GAFAM!{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #0f0;
+        }
+        #game-canvas {
+            border: 3px solid #0f0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        .game-info {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(0, 20, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #0f0;
+            max-width: 800px;
+        }
+        .game-info h1 {
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            margin: 0 0 10px 0;
+        }
+        .game-info p {
+            margin: 5px 0;
+        }
+        .controls {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 50, 0, 0.5);
+            border: 1px solid #0f0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="game-container">
+    <div id="game-canvas"></div>
+    
+    <div class="game-info">
+        <h1>🛡️ DATA GUARDIAN 🛡️</h1>
+        <p>Protégez vos données contre les GAFAM à travers 5 niveaux !</p>
+        <div class="controls">
+            <strong>Contrôles:</strong><br>
+            ⬆️⬇️⬅️➡️ Flèches : Déplacement case par case<br>
+            💎 Coffres : Heal ou boost d'attaque<br>
+            ⚔️ Combat : Pierre-Feuille-Ciseaux cyber !
+        </div>
+        <p id="game-status">Chargement du jeu...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+    <script>
+        const Phaser = window.Phaser;
+        const TILE_SIZE = 32;
+        
+        // Configuration globale
+        const GameConfig = {
+            currentLevel: 1,
+            maxLevel: 5,
+            playerData: 100,
+            attackBoostCount: 0,
+            visionPower: false,
+            oneShotPower: true,
+            levels: [
+                { name: 'Silicon Valley', boss: 'Mark Zuckerberg', company: 'Meta' },
+                { name: 'Redmond Campus', boss: 'Bill Gates', company: 'Microsoft' },
+                { name: 'Seattle HQ', boss: 'Jeff Bezos', company: 'Amazon' },
+                { name: 'Apple Park', boss: 'Tim Cook', company: 'Apple' },
+                { name: 'Googleplex', boss: 'Sundar Pichai', company: 'Google' }
+            ],
+            resistanceQuotes: [
+                "Je suis passé sur Linux, adieu Windows et tes télémétries !",
+                "Mes données ne sont PAS à vendre, Zuckerberg !",
+                "Non, je n'accepte PAS les cookies, merci.",
+                "Firefox > Chrome. Fight me.",
+                "J'utilise DuckDuckGo, Google ne saura RIEN de moi !",
+                "VPN activé 24/7, je suis un fantôme sur le net !",
+                "Windows 11 ? Non merci, je garde le contrôle de MA machine !",
+                "Alexa, arrête d'écouter mes conversations !",
+                "Signal >> WhatsApp. Chiffrement de bout en bout VRAIMENT privé !",
+                "Je refuse la reconnaissance faciale, merci bien !",
+                "Mes photos ne finiront PAS dans une IA d'entraînement !",
+                "Open source ou rien ! Je veux voir le code !",
+                "Edge ? Non merci, je ne suis pas un mouton Microsoft.",
+                "Cortana désactivée depuis le jour 1 !",
+                "Résistance numérique : chaque donnée compte !",
+                "Tor Browser, c'est mon véhicule pour l'anonymat !",
+                "Un smartphone sans app GAFAM, ça existe !",
+                "Métavers ? Non merci, la réalité me suffit !",
+                "Blockchain pour ma liberté numérique !",
+                "Pixel tracker blocked. You're welcome.",
+                "uBlock Origin : bloquer la surveillance, c'est possible !",
+                "Nos données valent de l'or, gardons-les !",
+                "Je compile mes applications moi-même !",
+                "Syndication RSS : échappez aux algos manipulateurs !",
+                "Jellyfin au lieu de Netflix, ma vie privée d'abord !",
+                "Matrix au lieu de Discord, vraiment décentralisé !",
+                "Nextcloud : mes fichiers, mes règles !",
+                "Mastodon au lieu de Twitter, pas de publicites !",
+                "Krita pour dessiner librement, sans tracking !",
+                "Mon OS n'appelle pas Redmond tous les jours !",
+                "Passkeys au lieu de mots de passe, plus sécurisé !",
+                "Chiffrer ou périr, telle est la devise !",
+                "Les GAFAM vous observe... mais pas moi !"
+            ]
+        };
+
+        // Boot Scene
+        class BootScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BootScene' });
+            }
+
+            preload() {
+                this.createSprites();
+            }
+
+            create() {
+                this.scene.start('MainScene');
+            }
+
+            createSprites() {
+                // === HÉROS - Style hacker avec casque ===
+                const playerGfx = this.add.graphics();
+                // Corps vert (hoodie)
+                playerGfx.fillStyle(0x00ff00, 1);
+                playerGfx.fillRect(10, 14, 12, 14); // Corps
+                playerGfx.fillRect(8, 18, 4, 8); // Bras gauche
+                playerGfx.fillRect(20, 18, 4, 8); // Bras droit
+                // Tête
+                playerGfx.fillStyle(0xffcc99, 1);
+                playerGfx.fillRect(12, 8, 8, 8); // Visage
+                // Casque/lunettes VR
+                playerGfx.fillStyle(0x00ffff, 1);
+                playerGfx.fillRect(10, 8, 12, 4); // Lunettes cyber
+                // Pieds
+                playerGfx.fillStyle(0x003300, 1);
+                playerGfx.fillRect(10, 28, 4, 4);
+                playerGfx.fillRect(18, 28, 4, 4);
+                playerGfx.generateTexture('player', 32, 32);
+                playerGfx.destroy();
+
+                // === ENNEMIS - Robots GAFAM ===
+                const enemies = [
+                    { key: 'enemy_google', color: 0x4285F4, eye: 0xEA4335 },
+                    { key: 'enemy_apple', color: 0xA3AAAE, eye: 0x000000 },
+                    { key: 'enemy_meta', color: 0x1877F2, eye: 0x0866FF },
+                    { key: 'enemy_amazon', color: 0xFF9900, eye: 0xFFCC00 },
+                    { key: 'enemy_microsoft', color: 0x00A4EF, eye: 0x7FBA00 }
+                ];
+
+                enemies.forEach(enemy => {
+                    const gfx = this.add.graphics();
+                    // Corps robot
+                    gfx.fillStyle(enemy.color, 1);
+                    gfx.fillRect(6, 8, 20, 20); // Corps principal
+                    gfx.fillRect(4, 12, 2, 8); // Bras gauche
+                    gfx.fillRect(26, 12, 2, 8); // Bras droit
+                    // Antenne
+                    gfx.fillRect(15, 4, 2, 4);
+                    gfx.fillCircle(16, 4, 2);
+                    // Yeux rouges (surveillance)
+                    gfx.fillStyle(0xff0000, 1);
+                    gfx.fillRect(10, 14, 4, 4); // Œil gauche
+                    gfx.fillRect(18, 14, 4, 4); // Œil droit
+                    // Logo/écran sur le torse
+                    gfx.fillStyle(enemy.eye, 1);
+                    gfx.fillRect(12, 20, 8, 4);
+                    gfx.generateTexture(enemy.key, 32, 32);
+                    gfx.destroy();
+                });
+
+                // === BOSS - 5 versions uniques par niveau ===
+                const bosses = [
+                    { key: 'boss_1', primary: 0x1877F2, secondary: 0x4267B2, accent: 0x0866FF }, // Meta blue
+                    { key: 'boss_2', primary: 0x00A4EF, secondary: 0x7FBA00, accent: 0xFFB900 }, // Microsoft colors
+                    { key: 'boss_3', primary: 0xFF9900, secondary: 0x146EB4, accent: 0x232F3E }, // Amazon orange
+                    { key: 'boss_4', primary: 0xA3AAAE, secondary: 0x555555, accent: 0x000000 }, // Apple gray
+                    { key: 'boss_5', primary: 0x4285F4, secondary: 0xEA4335, accent: 0xFBBC05 }  // Google colors
+                ];
+
+                bosses.forEach((boss, index) => {
+                    const gfx = this.add.graphics();
+                    
+                    if (index === 0) { // ZUCKERBERG - Portrait visage jeune
+                        // Forme de tête ovale allongée
+                        gfx.fillStyle(0xffd4a3, 1);
+                        gfx.fillRect(10, 8, 12, 16); // Visage allongé
+                        gfx.fillRect(8, 12, 2, 8);
+                        gfx.fillRect(22, 12, 2, 8);
+                        gfx.fillRect(12, 6, 8, 2); // Front
+                        // Cou
+                        gfx.fillRect(13, 24, 6, 4);
+                        // Hoodie bleu Meta
+                        gfx.fillStyle(boss.primary, 1);
+                        gfx.fillRect(8, 28, 16, 4);
+                        gfx.fillRect(6, 28, 2, 4);
+                        gfx.fillRect(24, 28, 2, 4);
+                        // Cheveux bouclés bruns emblématiques
+                        gfx.fillStyle(0x2d1b0e, 1);
+                        gfx.fillRect(10, 4, 12, 6); // Base cheveux
+                        gfx.fillCircle(11, 5, 2); // Boucles
+                        gfx.fillCircle(14, 4, 2);
+                        gfx.fillCircle(16, 4, 2);
+                        gfx.fillCircle(18, 4, 2);
+                        gfx.fillCircle(21, 5, 2);
+                        gfx.fillRect(8, 8, 2, 4); // Côtés
+                        gfx.fillRect(22, 8, 2, 4);
+                        // Yeux marrons foncés rapprochés
+                        gfx.fillStyle(0x3d2817, 1);
+                        gfx.fillRect(12, 14, 3, 3);
+                        gfx.fillRect(17, 14, 3, 3);
+                        gfx.fillStyle(0xffffff, 1);
+                        gfx.fillRect(13, 15, 1, 1);
+                        gfx.fillRect(18, 15, 1, 1);
+                        // Nez
+                        gfx.fillStyle(0xffb380, 1);
+                        gfx.fillRect(15, 17, 2, 3);
+                        // Bouche neutre/sourire léger
+                        gfx.fillStyle(0x8b4513, 1);
+                        gfx.fillRect(13, 21, 6, 1);
+                        gfx.fillRect(12, 22, 1, 1);
+                        gfx.fillRect(19, 22, 1, 1);
+                        
+                    } else if (index === 1) { // BILL GATES - Lunettes épaisses caractéristiques
+                        // Tête carrée
+                        gfx.fillStyle(0xffd4a3, 1);
+                        gfx.fillRect(9, 6, 14, 18);
+                        // Cou
+                        gfx.fillRect(13, 24, 6, 4);
+                        // Pull/chemise
+                        gfx.fillStyle(boss.primary, 1);
+                        gfx.fillRect(8, 28, 16, 4);
+                        // Cheveux courts gris sur les côtés (calvitie partielle)
+                        gfx.fillStyle(0x9e9e9e, 1);
+                        gfx.fillRect(9, 6, 3, 6); // Côté gauche
+                        gfx.fillRect(20, 6, 3, 6); // Côté droit
+                        gfx.fillRect(10, 6, 12, 2); // Haut peu fourni
+                        // LUNETTES ÉPAISSES NOIRES - trait le + reconnaissable!
+                        gfx.fillStyle(0x000000, 1);
+                        // Monture épaisse carrée
+                        gfx.fillRect(10, 12, 5, 5); // Verre gauche
+                        gfx.fillRect(17, 12, 5, 5); // Verre droit
+                        gfx.fillRect(15, 13, 2, 2); // Pont épais
+                        // Branches épaisses
+                        gfx.fillRect(9, 13, 1, 3);
+                        gfx.fillRect(22, 13, 1, 3);
+                        // Reflets dans verres
+                        gfx.fillStyle(0x4a6fa5, 1);
+                        gfx.fillRect(11, 13, 2, 2);
+                        gfx.fillRect(18, 13, 2, 2);
+                        // Yeux derrière lunettes
+                        gfx.fillStyle(0x000000, 1);
+                        gfx.fillRect(12, 14, 1, 2);
+                        gfx.fillRect(19, 14, 1, 2);
+                        // Nez
+                        gfx.fillStyle(0xffb380, 1);
+                        gfx.fillRect(15, 18, 2, 3);
+                        // Sourire fermé
+                        gfx.fillStyle(0x8b4513, 1);
+                        gfx.fillRect(12, 22, 8, 1);
+                        
+                    } else if (index === 2) { // BEZOS - Crâne chauve TRÈS reconnaissable
+                        // CRÂNE CHAUVE BRILLANT (son trait le + distinctif!)
+                        gfx.fillStyle(0xf0d5b8, 1);
+                        gfx.fillCircle(16, 10, 9); // Crâne rond large
+                        gfx.fillRect(9, 10, 14, 12); // Visage rectangulaire musclé
+                        // Reflet sur crâne chauve
+                        gfx.fillStyle(0xfff5e6, 1);
+                        gfx.fillCircle(14, 6, 3);
+                        gfx.fillCircle(18, 5, 2);
+                        // Cou musclé épais
+                        gfx.fillStyle(0xf0d5b8, 1);
+                        gfx.fillRect(12, 22, 8, 6);
+                        // Costume noir
+                        gfx.fillStyle(0x1a1a1a, 1);
+                        gfx.fillRect(6, 28, 20, 4);
+                        // Chemise blanche visible
+                        gfx.fillStyle(0xffffff, 1);
+                        gfx.fillRect(13, 28, 6, 4);
+                        // Yeux plissés intenses (regard perçant)
+                        gfx.fillStyle(0x000000, 1);
+                        gfx.fillRect(11, 14, 3, 2);
+                        gfx.fillRect(18, 14, 3, 2);
+                        // Iris bleus
+                        gfx.fillStyle(0x4a6fa5, 1);
+                        gfx.fillRect(12, 14, 1, 1);
+                        gfx.fillRect(19, 14, 1, 1);
+                        // Sourcils épais
+                        gfx.fillStyle(0x8b7355, 1);
+                        gfx.fillRect(10, 13, 4, 1);
+                        gfx.fillRect(18, 13, 4, 1);
+                        // Nez prononcé
+                        gfx.fillStyle(0xdbb895, 1);
+                        gfx.fillRect(15, 16, 2, 4);
+                        // SOURIRE LARGE caractéristique
+                        gfx.fillStyle(0x000000, 1);
+                        gfx.fillRect(11, 20, 10, 1);
+                        gfx.fillRect(10, 19, 1, 1);
+                        gfx.fillRect(21, 19, 1, 1);
+                        gfx.fillRect(12, 21, 8, 1);
+                        
+                    } else if (index === 3) { // TIM COOK - Col roulé noir + lunettes fines
+                        // Visage ovale fin
+                        gfx.fillStyle(0xffd4a3, 1);
+                        gfx.fillRect(10, 8, 12, 16);
+                        gfx.fillRect(12, 6, 8, 2);
+                        // Cou
+                        gfx.fillRect(13, 24, 6, 2);
+                        // COL ROULÉ NOIR (signature Apple/Jobs)
+                        gfx.fillStyle(0x1a1a1a, 1);
+                        gfx.fillRect(8, 26, 16, 6);
+                        gfx.fillRect(10, 24, 12, 2); // Col montant
+                        // Cheveux courts gris argenté soignés
+                        gfx.fillStyle(0xb8b8b8, 1);
+                        gfx.fillRect(10, 4, 12, 5);
+                        gfx.fillRect(8, 7, 2, 3);
+                        gfx.fillRect(22, 7, 2, 3);
+                        // Raie sur le côté
+                        gfx.fillStyle(0x9e9e9e, 1);
+                        gfx.fillRect(14, 4, 1, 4);
+                        // Lunettes fines rectangulaires discrètes
+                        gfx.fillStyle(0x4a4a4a, 1);
+                        gfx.fillRect(11, 13, 4, 3);
+                        gfx.fillRect(17, 13, 4, 3);
+                        gfx.fillRect(15, 14, 2, 1);
+                        gfx.fillRect(10, 14, 1, 1);
+                        gfx.fillRect(21, 14, 1, 1);
+                        // Yeux calmes
+                        gfx.fillStyle(0x5d4e37, 1);
+                        gfx.fillRect(12, 14, 2, 2);
+                        gfx.fillRect(18, 14, 2, 2);
+                        // Nez
+                        gfx.fillStyle(0xffb380, 1);
+                        gfx.fillRect(15, 16, 2, 3);
+                        // Sourire léger professionnel
+                        gfx.fillStyle(0x8b4513, 1);
+                        gfx.fillRect(13, 20, 6, 1);
+                        
+                    } else { // SUNDAR PICHAI - Teint indien, cheveux noirs, sourire
+                        // Teint indien distinctif
+                        gfx.fillStyle(0xc19a6b, 1);
+                        gfx.fillRect(10, 8, 12, 16);
+                        gfx.fillRect(8, 12, 2, 8);
+                        gfx.fillRect(22, 12, 2, 8);
+                        // Cou
+                        gfx.fillRect(13, 24, 6, 4);
+                        // Chemise bleue Google
+                        gfx.fillStyle(boss.primary, 1);
+                        gfx.fillRect(8, 28, 16, 4);
+                        // Cheveux TRÈS noirs épais fournis
+                        gfx.fillStyle(0x0a0a0a, 1);
+                        gfx.fillRect(8, 4, 16, 6);
+                        gfx.fillRect(7, 8, 2, 4);
+                        gfx.fillRect(23, 8, 2, 4);
+                        // Volume et texture
+                        gfx.fillCircle(10, 5, 2);
+                        gfx.fillCircle(16, 4, 2);
+                        gfx.fillCircle(22, 5, 2);
+                        // Lunettes rondes modernes
+                        gfx.fillStyle(0x2d2d2d, 1);
+                        gfx.fillCircle(12, 14, 3);
+                        gfx.fillCircle(20, 14, 3);
+                        gfx.fillRect(15, 14, 2, 1);
+                        gfx.fillRect(9, 14, 1, 1);
+                        gfx.fillRect(23, 14, 1, 1);
+                        // Reflets
+                        gfx.fillStyle(0x6a6a6a, 1);
+                        gfx.fillCircle(11, 13, 1);
+                        gfx.fillCircle(19, 13, 1);
+                        // Yeux marrons foncés
+                        gfx.fillStyle(0x1a0f00, 1);
+                        gfx.fillRect(12, 14, 1, 2);
+                        gfx.fillRect(20, 14, 1, 2);
+                        // Sourcils épais
+                        gfx.fillStyle(0x0a0a0a, 1);
+                        gfx.fillRect(10, 12, 4, 1);
+                        gfx.fillRect(18, 12, 4, 1);
+                        // Nez
+                        gfx.fillStyle(0xa67c52, 1);
+                        gfx.fillRect(15, 16, 2, 4);
+                        // GRAND SOURIRE amical (très expressif)
+                        gfx.fillStyle(0xffffff, 1);
+                        gfx.fillRect(12, 21, 8, 2); // Dents
+                        gfx.fillStyle(0x5d3a1a, 1);
+                        gfx.fillRect(11, 20, 10, 1);
+                        gfx.fillRect(10, 21, 1, 1);
+                        gfx.fillRect(21, 21, 1, 1);
+                        gfx.fillRect(11, 23, 10, 1);
+                    }
+                    
+                    gfx.generateTexture(boss.key, 32, 32);
+                    gfx.destroy();
+                });
+
+                // === COFFRE - Style trésor pixel art ===
+                const chestGfx = this.add.graphics();
+                // Base du coffre (bois)
+                chestGfx.fillStyle(0x8B4513, 1);
+                chestGfx.fillRect(6, 16, 20, 12); // Base
+                // Couvercle
+                chestGfx.fillRect(6, 12, 20, 6);
+                // Bordures dorées
+                chestGfx.fillStyle(0xFFD700, 1);
+                chestGfx.fillRect(6, 12, 20, 2); // Haut couvercle
+                chestGfx.fillRect(6, 16, 20, 2); // Séparation
+                chestGfx.fillRect(6, 26, 20, 2); // Bas
+                // Serrure dorée
+                chestGfx.fillRect(14, 18, 4, 6);
+                chestGfx.fillCircle(16, 20, 2);
+                // Reflets
+                chestGfx.fillStyle(0xFFFFAA, 0.6);
+                chestGfx.fillRect(8, 13, 2, 2);
+                chestGfx.fillRect(22, 13, 2, 2);
+                chestGfx.generateTexture('chest', 32, 32);
+                chestGfx.destroy();
+
+                // === SOL - Damier cyberpunk ===
+                const groundGfx = this.add.graphics();
+                // Base sombre
+                groundGfx.fillStyle(0x1a1a2e, 1);
+                groundGfx.fillRect(0, 0, 32, 32);
+                // Motif de grille néon
+                groundGfx.lineStyle(1, 0x0f3460, 0.5);
+                groundGfx.strokeRect(0, 0, 32, 32);
+                groundGfx.moveTo(16, 0);
+                groundGfx.lineTo(16, 32);
+                groundGfx.strokePath();
+                groundGfx.moveTo(0, 16);
+                groundGfx.lineTo(32, 16);
+                groundGfx.strokePath();
+                // Points lumineux aux intersections
+                groundGfx.fillStyle(0x16213e, 1);
+                groundGfx.fillRect(7, 7, 2, 2);
+                groundGfx.fillRect(23, 7, 2, 2);
+                groundGfx.fillRect(7, 23, 2, 2);
+                groundGfx.fillRect(23, 23, 2, 2);
+                groundGfx.generateTexture('ground', 32, 32);
+                groundGfx.destroy();
+
+                // === MURS - 5 versions uniques par niveau ===
+                const walls = [
+                    { key: 'wall_1', bg: 0x1a237e, border: 0x0d1642, led1: 0x1877F2, led2: 0x4267B2 }, // Meta - Murs bleus sociaux
+                    { key: 'wall_2', bg: 0x1b5e20, border: 0x0d2f10, led1: 0x00ff00, led2: 0x00A4EF }, // Microsoft - Murs verts Windows
+                    { key: 'wall_3', bg: 0x4a2c2a, border: 0x3e1f1d, led1: 0xFF9900, led2: 0xffcc00 }, // Amazon - Murs marron entrepôt
+                    { key: 'wall_4', bg: 0x37474f, border: 0x263238, led1: 0xffffff, led2: 0xA3AAAE }, // Apple - Murs gris minimaliste
+                    { key: 'wall_5', bg: 0x1565c0, border: 0x0d47a1, led1: 0x4285F4, led2: 0xEA4335 }  // Google - Murs bleu datacenter
+                ];
+
+                walls.forEach((wall, index) => {
+                    const gfx = this.add.graphics();
+                    // Panneau métallique
+                    gfx.fillStyle(wall.bg, 1);
+                    gfx.fillRect(0, 0, 32, 32);
+                    // Bordure de panneau
+                    gfx.lineStyle(2, wall.border, 1);
+                    gfx.strokeRect(2, 2, 28, 28);
+                    
+                    // Variations selon le niveau
+                    if (index === 0) { // Meta - Logo F stylisé
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillRect(8, 8, 8, 2);
+                        gfx.fillRect(8, 8, 2, 12);
+                        gfx.fillRect(8, 13, 6, 2);
+                    } else if (index === 1) { // Microsoft - Fenêtre Windows
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillRect(8, 8, 6, 6);
+                        gfx.fillRect(16, 8, 6, 6);
+                        gfx.fillStyle(wall.led2, 1);
+                        gfx.fillRect(8, 16, 6, 6);
+                        gfx.fillRect(16, 16, 6, 6);
+                    } else if (index === 2) { // Amazon - Flèche
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillRect(8, 14, 12, 2);
+                        gfx.fillRect(18, 12, 2, 2);
+                        gfx.fillRect(20, 10, 2, 2);
+                        gfx.fillRect(18, 16, 2, 2);
+                        gfx.fillRect(20, 18, 2, 2);
+                    } else if (index === 3) { // Apple - Pomme
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillCircle(14, 14, 5);
+                        gfx.fillStyle(wall.bg, 1);
+                        gfx.fillCircle(17, 12, 2);
+                        gfx.fillStyle(wall.led2, 1);
+                        gfx.fillRect(13, 8, 2, 3);
+                    } else { // Google - G stylisé
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillCircle(14, 14, 6);
+                        gfx.fillStyle(wall.bg, 1);
+                        gfx.fillCircle(14, 14, 4);
+                        gfx.fillStyle(wall.led1, 1);
+                        gfx.fillRect(14, 8, 6, 12);
+                        gfx.fillStyle(wall.bg, 1);
+                        gfx.fillRect(14, 10, 6, 8);
+                        gfx.fillStyle(wall.led2, 1);
+                        gfx.fillRect(16, 14, 4, 2);
+                    }
+                    
+                    // Vis aux coins (commun)
+                    gfx.fillStyle(0x808080, 1);
+                    gfx.fillCircle(4, 4, 1);
+                    gfx.fillCircle(28, 4, 1);
+                    gfx.fillCircle(4, 28, 1);
+                    gfx.fillCircle(28, 28, 1);
+                    
+                    gfx.generateTexture(wall.key, 32, 32);
+                    gfx.destroy();
+                });
+            }
+        }
+
+        // Main Scene - Jeu au tour par tour
+        class MainScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'MainScene' });
+            }
+
+            create() {
+                this.gridSize = { width: 25, height: 18 };
+                this.canMove = true;
+                this.aggroInProgress = false;
+                
+                this.createWorld();
+                this.createPlayer();
+                this.createEntities();
+                this.createUI();
+                this.setupInput();
+            }
+
+            createWorld() {
+                // Map avec obstacles
+                this.map = [];
+                const wallSprite = `wall_${GameConfig.currentLevel}`; // Mur spécifique au niveau
+                
+                for (let y = 0; y < this.gridSize.height; y++) {
+                    this.map[y] = [];
+                    for (let x = 0; x < this.gridSize.width; x++) {
+                        // Bordures
+                        if (x === 0 || x === this.gridSize.width - 1 || y === 0 || y === this.gridSize.height - 1) {
+                            this.map[y][x] = 'wall';
+                            this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, wallSprite);
+                        } else {
+                            this.map[y][x] = 'ground';
+                            this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, 'ground');
+                        }
+                    }
+                }
+
+                // Récupérer les obstacles du niveau
+                const obstacles = this.generateMapForLevel(GameConfig.currentLevel);
+
+                obstacles.forEach(obs => {
+                    for (let y = obs.y; y < obs.y + obs.height; y++) {
+                        for (let x = obs.x; x < obs.x + obs.width; x++) {
+                            if (y < this.gridSize.height && x < this.gridSize.width) {
+                                this.map[y][x] = 'wall';
+                                this.add.image(x * TILE_SIZE + 16, y * TILE_SIZE + 16, wallSprite);
+                            }
+                        }
+                    }
+                });
+            }
+
+            generateMapForLevel(level) {
+                // Chaque niveau a sa propre carte d'obstacles
+                switch(level) {
+                    case 1: // Silicon Valley - Obstacles éparpillés
+                        return [
+                            {x: 5, y: 3, width: 2, height: 8},
+                            {x: 10, y: 6, width: 3, height: 5},
+                            {x: 18, y: 2, width: 2, height: 10},
+                            {x: 12, y: 10, width: 5, height: 2},
+                            {x: 3, y: 13, width: 8, height: 2}
+                        ];
+                    
+                    case 2: // Redmond Campus - Labyrinth horizontal
+                        return [
+                            {x: 4, y: 4, width: 15, height: 2},
+                            {x: 4, y: 8, width: 15, height: 2},
+                            {x: 4, y: 12, width: 15, height: 2},
+                            {x: 8, y: 6, width: 2, height: 4},
+                            {x: 14, y: 10, width: 2, height: 4}
+                        ];
+                    
+                    case 3: // Seattle HQ - Crosses (Croix)
+                        return [
+                            {x: 12, y: 2, width: 2, height: 15}, // Verticale
+                            {x: 3, y: 8, width: 20, height: 2},  // Horizontale
+                            {x: 5, y: 4, width: 3, height: 3},   // Petits blocs
+                            {x: 17, y: 5, width: 2, height: 4},
+                            {x: 8, y: 14, width: 4, height: 2}
+                        ];
+                    
+                    case 4: // Apple Park - Spirale/Circulaire
+                        return [
+                            {x: 6, y: 5, width: 12, height: 2},   // Haut
+                            {x: 6, y: 12, width: 12, height: 2},  // Bas
+                            {x: 6, y: 7, width: 2, height: 5},    // Gauche
+                            {x: 16, y: 7, width: 2, height: 5},   // Droite
+                            {x: 10, y: 9, width: 4, height: 2}    // Centre
+                        ];
+                    
+                    case 5: // Googleplex - Grille complexe
+                        return [
+                            {x: 4, y: 3, width: 2, height: 12},
+                            {x: 10, y: 3, width: 2, height: 12},
+                            {x: 16, y: 3, width: 2, height: 12},
+                            {x: 7, y: 6, width: 8, height: 2},
+                            {x: 7, y: 11, width: 8, height: 2},
+                            {x: 4, y: 14, width: 14, height: 2}
+                        ];
+                    
+                    default:
+                        return [{x: 5, y: 3, width: 2, height: 8}];
+                }
+            }
+
+            createPlayer() {
+                // Position initiale selon le niveau
+                let startPos = { x: 2, y: 2 }; // Position par défaut
+                
+                if (GameConfig.currentLevel === 1) {
+                    startPos = { x: 2, y: 2 }; // Silicon Valley: bas-gauche
+                } else if (GameConfig.currentLevel === 2) {
+                    startPos = { x: 2, y: 8 }; // Redmond: gauche centre
+                } else if (GameConfig.currentLevel === 3) {
+                    startPos = { x: 2, y: 2 }; // Seattle: haut-gauche
+                } else if (GameConfig.currentLevel === 4) {
+                    startPos = { x: 2, y: 9 }; // Apple Park: gauche centre bas
+                } else if (GameConfig.currentLevel === 5) {
+                    startPos = { x: 2, y: 15 }; // Googleplex: bas-gauche
+                }
+                
+                this.playerGrid = startPos;
+                this.player = this.add.sprite(
+                    this.playerGrid.x * TILE_SIZE + 16,
+                    this.playerGrid.y * TILE_SIZE + 16,
+                    'player'
+                ).setDepth(10);
+            }
+
+            createEntities() {
+                this.enemies = [];
+                this.chests = [];
+
+                const enemyTypes = ['enemy_google', 'enemy_apple', 'enemy_meta', 'enemy_amazon', 'enemy_microsoft'];
+                const enemyNames = ['Google Bot', 'Apple Tracker', 'Meta Spy', 'Amazon Crawler', 'MS Telemetry'];
+                const levelData = GameConfig.levels[GameConfig.currentLevel - 1];
+
+                // Boss placé au fond de la map (zone droite haute)
+                const bossPos = this.findEmptyPositionInZone(this.gridSize.width - 5, this.gridSize.width - 2, 2, 5);
+                const bossSprite = `boss_${GameConfig.currentLevel}`; // Boss spécifique au niveau
+                const boss = this.add.sprite(bossPos.x * TILE_SIZE + 16, bossPos.y * TILE_SIZE + 16, bossSprite);
+                boss.setScale(1.5);
+                boss.gridPos = bossPos;
+                boss.enemyName = levelData.boss;
+                boss.company = levelData.company;
+                boss.health = 100;
+                boss.isBoss = true;
+                boss.facing = Phaser.Math.RND.pick(['left', 'right', 'up', 'down']);
+                this.enemies.push(boss);
+                this.map[bossPos.y][bossPos.x] = 'boss';
+                this.addEnemyDirectionIndicator(boss);
+
+                // Coffres dans les coins ou zones éloignées (avec récompenses importantes)
+                const chestPositions = [
+                    this.findEmptyPositionInZone(this.gridSize.width - 5, this.gridSize.width - 2, this.gridSize.height - 5, this.gridSize.height - 2), // Coin bas-droite
+                    this.findEmptyPositionInZone(2, 5, this.gridSize.height - 5, this.gridSize.height - 2), // Coin bas-gauche
+                    this.findEmptyPositionInZone(this.gridSize.width - 5, this.gridSize.width - 2, 10, 13) // Zone droite milieu
+                ];
+
+                chestPositions.forEach((pos, index) => {
+                    const chest = this.add.sprite(pos.x * TILE_SIZE + 16, pos.y * TILE_SIZE + 16, 'chest');
+                    chest.gridPos = pos;
+                    // Coffres éloignés ont de meilleures récompenses
+                    if (index === 0) {
+                        chest.type = 'oneshot'; // Premier coffre = oneshot
+                    } else if (index === 1) {
+                        chest.type = 'boost'; // Deuxième = boost
+                    } else {
+                        chest.type = Phaser.Math.RND.pick(['heal', 'vision']); // Troisième = aléatoire
+                    }
+                    this.chests.push(chest);
+                    this.map[pos.y][pos.x] = 'chest';
+                });
+
+                // Ennemis placés stratégiquement pour protéger les coffres et le boss
+                // Ennemi 1: Garde le chemin vers le boss
+                const guard1Pos = this.findEmptyPositionInZone(this.gridSize.width - 8, this.gridSize.width - 6, 3, 6);
+                const idx1 = Phaser.Math.Between(0, 4);
+                const guard1 = this.add.sprite(guard1Pos.x * TILE_SIZE + 16, guard1Pos.y * TILE_SIZE + 16, enemyTypes[idx1]);
+                guard1.gridPos = guard1Pos;
+                guard1.enemyName = enemyNames[idx1];
+                guard1.health = Phaser.Math.Between(40, 60);
+                guard1.isBoss = false;
+                guard1.facing = Phaser.Math.RND.pick(['left', 'right', 'up', 'down']);
+                this.enemies.push(guard1);
+                this.map[guard1Pos.y][guard1Pos.x] = 'enemy';
+                this.addEnemyDirectionIndicator(guard1);
+
+                // Ennemi 2: Garde le coffre du coin bas-droite
+                const guard2Pos = this.findEmptyPositionInZone(this.gridSize.width - 7, this.gridSize.width - 5, this.gridSize.height - 6, this.gridSize.height - 4);
+                const idx2 = Phaser.Math.Between(0, 4);
+                const guard2 = this.add.sprite(guard2Pos.x * TILE_SIZE + 16, guard2Pos.y * TILE_SIZE + 16, enemyTypes[idx2]);
+                guard2.gridPos = guard2Pos;
+                guard2.enemyName = enemyNames[idx2];
+                guard2.health = Phaser.Math.Between(40, 60);
+                guard2.isBoss = false;
+                guard2.facing = Phaser.Math.RND.pick(['left', 'right', 'up', 'down']);
+                this.enemies.push(guard2);
+                this.map[guard2Pos.y][guard2Pos.x] = 'enemy';
+                this.addEnemyDirectionIndicator(guard2);
+
+                // Ennemi 3: Garde le coffre du coin bas-gauche
+                const guard3Pos = this.findEmptyPositionInZone(3, 6, this.gridSize.height - 6, this.gridSize.height - 4);
+                const idx3 = Phaser.Math.Between(0, 4);
+                const guard3 = this.add.sprite(guard3Pos.x * TILE_SIZE + 16, guard3Pos.y * TILE_SIZE + 16, enemyTypes[idx3]);
+                guard3.gridPos = guard3Pos;
+                guard3.enemyName = enemyNames[idx3];
+                guard3.health = Phaser.Math.Between(40, 60);
+                guard3.isBoss = false;
+                guard3.facing = Phaser.Math.RND.pick(['left', 'right', 'up', 'down']);
+                this.enemies.push(guard3);
+                this.map[guard3Pos.y][guard3Pos.x] = 'enemy';
+                this.addEnemyDirectionIndicator(guard3);
+
+                // Ennemi 4: Patrouille zone centrale
+                const guard4Pos = this.findEmptyPositionInZone(10, 14, 8, 10);
+                const idx4 = Phaser.Math.Between(0, 4);
+                const guard4 = this.add.sprite(guard4Pos.x * TILE_SIZE + 16, guard4Pos.y * TILE_SIZE + 16, enemyTypes[idx4]);
+                guard4.gridPos = guard4Pos;
+                guard4.enemyName = enemyNames[idx4];
+                guard4.health = Phaser.Math.Between(40, 60);
+                guard4.isBoss = false;
+                guard4.facing = Phaser.Math.RND.pick(['left', 'right', 'up', 'down']);
+                this.enemies.push(guard4);
+                this.map[guard4Pos.y][guard4Pos.x] = 'enemy';
+                this.addEnemyDirectionIndicator(guard4);
+            }
+
+            addEnemyDirectionIndicator(enemy) {
+                const arrowSymbols = {
+                    'up': '▲',
+                    'down': '▼',
+                    'left': '◀',
+                    'right': '▶'
+                };
+
+                const offsetX = {
+                    'up': 0,
+                    'down': 0,
+                    'left': -12,
+                    'right': 12
+                };
+
+                const offsetY = {
+                    'up': -12,
+                    'down': 12,
+                    'left': 0,
+                    'right': 0
+                };
+
+                const arrow = this.add.text(
+                    enemy.x + offsetX[enemy.facing],
+                    enemy.y + offsetY[enemy.facing],
+                    arrowSymbols[enemy.facing],
+                    {
+                        fontSize: '14px',
+                        fill: '#ff0000',
+                        fontStyle: 'bold'
+                    }
+                ).setOrigin(0.5).setDepth(50);
+
+                enemy.directionArrow = arrow;
+            }
+
+            findEmptyPosition() {
+                let x, y;
+                do {
+                    x = Phaser.Math.Between(2, this.gridSize.width - 3);
+                    y = Phaser.Math.Between(2, this.gridSize.height - 3);
+                } while (this.map[y][x] !== 'ground');
+                return { x, y };
+            }
+
+            findEmptyPositionInZone(minX, maxX, minY, maxY) {
+                let x, y;
+                let attempts = 0;
+                do {
+                    x = Phaser.Math.Between(minX, maxX);
+                    y = Phaser.Math.Between(minY, maxY);
+                    attempts++;
+                    // Fallback si zone trop encombrée
+                    if (attempts > 100) return this.findEmptyPosition();
+                } while (this.map[y][x] !== 'ground');
+                return { x, y };
+            }
+
+            createUI() {
+                const levelData = GameConfig.levels[GameConfig.currentLevel - 1];
+                
+                this.levelText = this.add.text(16, 16, `Niveau ${GameConfig.currentLevel}/5: ${levelData.name}`, {
+                    fontSize: '18px',
+                    fill: '#ff0',
+                    backgroundColor: '#000',
+                    padding: { x: 10, y: 5 }
+                }).setDepth(100);
+
+                this.healthText = this.add.text(16, 45, `❤️ ${GameConfig.playerData} données`, {
+                    fontSize: '20px',
+                    fill: '#0f0',
+                    backgroundColor: '#000',
+                    padding: { x: 10, y: 5 }
+                }).setDepth(100);
+
+                if (GameConfig.attackBoostCount > 0) {
+                    this.boostText = this.add.text(16, 105, `⚡ BOOST x${GameConfig.attackBoostCount} !`, {
+                        fontSize: '16px',
+                        fill: '#ff0',
+                        backgroundColor: '#000',
+                        padding: { x: 10, y: 5 }
+                    }).setDepth(100);
+                }
+            }
+
+            setupInput() {
+                this.input.keyboard.on('keydown-UP', (event) => {
+                    event.preventDefault();
+                    this.movePlayer(0, -1);
+                });
+                this.input.keyboard.on('keydown-DOWN', (event) => {
+                    event.preventDefault();
+                    this.movePlayer(0, 1);
+                });
+                this.input.keyboard.on('keydown-LEFT', (event) => {
+                    event.preventDefault();
+                    this.movePlayer(-1, 0);
+                });
+                this.input.keyboard.on('keydown-RIGHT', (event) => {
+                    event.preventDefault();
+                    this.movePlayer(1, 0);
+                });
+            }
+
+            movePlayer(dx, dy) {
+                if (!this.canMove || this.aggroInProgress) return;
+
+                const newX = this.playerGrid.x + dx;
+                const newY = this.playerGrid.y + dy;
+
+                if (newX < 0 || newX >= this.gridSize.width || newY < 0 || newY >= this.gridSize.height) return;
+
+                const tile = this.map[newY][newX];
+
+                if (tile === 'wall') return;
+
+                if (tile === 'enemy' || tile === 'boss') {
+                    const enemy = this.enemies.find(e => e.gridPos.x === newX && e.gridPos.y === newY);
+                    if (enemy) {
+                        this.startBattle(enemy);
+                    }
+                    return;
+                }
+
+                if (tile === 'chest') {
+                    const chest = this.chests.find(c => c.gridPos.x === newX && c.gridPos.y === newY);
+                    if (chest) {
+                        this.openChest(chest);
+                    }
+                    return;
+                }
+
+                // Déplacement valide
+                this.playerGrid.x = newX;
+                this.playerGrid.y = newY;
+
+                this.tweens.add({
+                    targets: this.player,
+                    x: newX * TILE_SIZE + 16,
+                    y: newY * TILE_SIZE + 16,
+                    duration: 150,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        // Vérifier si un ennemi est adjacent après le mouvement
+                        this.checkEnemyAggro();
+                    }
+                });
+            }
+
+            checkEnemyAggro() {
+                // Les ennemis attaquent si le joueur passe devant eux à 7 cases dans leur direction
+                const visionRange = 7;
+
+                for (const enemy of this.enemies) {
+                    if (!enemy || !enemy.active) continue;
+
+                    const dx = this.playerGrid.x - enemy.gridPos.x;
+                    const dy = this.playerGrid.y - enemy.gridPos.y;
+                    const distance = Math.max(Math.abs(dx), Math.abs(dy)); // Distance de Chebyshev (ligne de vue)
+
+                    if (distance <= visionRange && distance > 0) {
+                        // Vérifier si le joueur est dans la direction que l'ennemi regarde
+                        let isInLineOfSight = false;
+
+                        // Tolérance : le joueur peut être légèrement décalé (1 case)
+                        if (enemy.facing === 'up' && dy < 0 && Math.abs(dx) <= 1) isInLineOfSight = true;
+                        if (enemy.facing === 'down' && dy > 0 && Math.abs(dx) <= 1) isInLineOfSight = true;
+                        if (enemy.facing === 'left' && dx < 0 && Math.abs(dy) <= 1) isInLineOfSight = true;
+                        if (enemy.facing === 'right' && dx > 0 && Math.abs(dy) <= 1) isInLineOfSight = true;
+
+                        if (isInLineOfSight) {
+                            // Vérifier qu'il n'y a pas de murs entre l'ennemi et le joueur
+                            if (this.hasLineOfSightToPlayer(enemy)) {
+                                this.aggroInProgress = true;
+                                this.showMessage(`⚠️ ${enemy.enemyName} vous attaque !`);
+                                this.time.delayedCall(800, () => {
+                                    this.startBattle(enemy);
+                                    this.aggroInProgress = false;
+                                });
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            hasLineOfSightToPlayer(enemy) {
+                const dx = this.playerGrid.x - enemy.gridPos.x;
+                const dy = this.playerGrid.y - enemy.gridPos.y;
+
+                // Tracer la ligne de vue
+                if (dx === 0) {
+                    // Mouvement vertical
+                    const step = dy > 0 ? 1 : -1;
+                    for (let y = enemy.gridPos.y + step; y !== this.playerGrid.y; y += step) {
+                        if (this.map[y][enemy.gridPos.x] === 'wall') {
+                            return false;
+                        }
+                    }
+                } else if (dy === 0) {
+                    // Mouvement horizontal
+                    const step = dx > 0 ? 1 : -1;
+                    for (let x = enemy.gridPos.x + step; x !== this.playerGrid.x; x += step) {
+                        if (this.map[enemy.gridPos.y][x] === 'wall') {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            openChest(chest) {
+                this.map[chest.gridPos.y][chest.gridPos.x] = 'ground';
+                
+                if (chest.type === 'heal') {
+                    const heal = 30;
+                    GameConfig.playerData += heal;
+                    this.showMessage(`💚 +${heal} données !`);
+                } else if (chest.type === 'boost') {
+                    GameConfig.attackBoostCount += 1;
+                    this.showMessage(`⚡ Boost d'attaque obtenu ! (x${GameConfig.attackBoostCount})`);
+                    if (!this.boostText) {
+                        this.boostText = this.add.text(16, 105, `⚡ BOOST x${GameConfig.attackBoostCount} !`, {
+                            fontSize: '16px',
+                            fill: '#ff0',
+                            backgroundColor: '#000',
+                            padding: { x: 10, y: 5 }
+                        }).setDepth(100);
+                    } else {
+                        this.boostText.setText(`⚡ BOOST x${GameConfig.attackBoostCount} !`);
+                    }
+                } else if (chest.type === 'vision') {
+                    GameConfig.visionPower = true;
+                    this.showMessage(`🔮 Pouvoir de Vision obtenu !\nVoyez le prochain coup ennemi !`);
+                    if (!this.visionText) {
+                        this.visionText = this.add.text(16, 135, `🔮 VISION ACTIVE !`, {
+                            fontSize: '16px',
+                            fill: '#a0f',
+                            backgroundColor: '#000',
+                            padding: { x: 10, y: 5 }
+                        }).setDepth(100);
+                    }
+                } else if (chest.type === 'oneshot') {
+                    GameConfig.oneShotPower += 1;
+                    this.showMessage(`💥 OneShot obtenu ! (x${GameConfig.oneShotPower})`);
+                    if (!this.oneShotText) {
+                        this.oneShotText = this.add.text(16, 165, `💥 ONESHOT x${GameConfig.oneShotPower} !`, {
+                            fontSize: '16px',
+                            fill: '#f0f',
+                            backgroundColor: '#000',
+                            padding: { x: 10, y: 5 }
+                        }).setDepth(100);
+                    } else {
+                        this.oneShotText.setText(`💥 ONESHOT x${GameConfig.oneShotPower} !`);
+                    }
+                }
+
+                this.healthText.setText(`❤️ ${GameConfig.playerData} données`);
+                chest.destroy();
+                this.chests = this.chests.filter(c => c !== chest);
+            }
+
+            showMessage(text) {
+                const msg = this.add.text(400, 300, text, {
+                    fontSize: '32px',
+                    fill: '#ff0',
+                    backgroundColor: '#000',
+                    padding: { x: 20, y: 10 }
+                }).setOrigin(0.5).setDepth(200);
+
+                this.tweens.add({
+                    targets: msg,
+                    alpha: 0,
+                    y: 250,
+                    duration: 1500,
+                    onComplete: () => msg.destroy()
+                });
+            }
+
+            startBattle(enemy) {
+                // Vérifier que l'ennemi est encore actif
+                if (!enemy || !enemy.active) return;
+                
+                this.canMove = false;
+                this.scene.launch('BattleScene', {
+                    enemyName: enemy.enemyName,
+                    enemyCompany: enemy.company || '',
+                    enemyHealth: enemy.health,
+                    isBoss: enemy.isBoss,
+                    enemy: enemy
+                });
+                this.scene.pause();
+            }
+
+            endBattle(victory, enemy) {
+                if (!enemy || !enemy.active) return; // Ennemi déjà détruit
+                
+                if (victory) {
+                    this.map[enemy.gridPos.y][enemy.gridPos.x] = 'ground';
+                    // Détruire la flèche de direction
+                    if (enemy.directionArrow) {
+                        enemy.directionArrow.destroy();
+                    }
+                    
+                    // Récupérer des PV/données après victoire
+                    const healAmount = enemy.isBoss ? 100 : 50;
+                    GameConfig.playerData += healAmount;
+                    this.showMessage(`💚 +${healAmount} données récupérées !`);
+                    
+                    enemy.destroy();
+                    this.enemies = this.enemies.filter(e => e !== enemy);
+
+                    // Si c'était le boss, niveau terminé !
+                    if (enemy.isBoss) {
+                        if (GameConfig.currentLevel < GameConfig.maxLevel) {
+                            this.nextLevel();
+                        } else {
+                            this.gameWon();
+                        }
+                    }
+                }
+
+                this.healthText.setText(`❤️ ${GameConfig.playerData} données`);
+                
+                this.canMove = true;
+            }
+
+            nextLevel() {
+                GameConfig.currentLevel++;
+                this.showMessage(`🎉 Niveau ${GameConfig.currentLevel - 1} terminé !`);
+                this.time.delayedCall(2000, () => {
+                    this.scene.restart();
+                });
+            }
+
+            gameWon() {
+                const winText = this.add.text(400, 300, '🎉 VICTOIRE TOTALE !\nVous avez protégé vos données !', {
+                    fontSize: '32px',
+                    fill: '#0f0',
+                    backgroundColor: '#000',
+                    padding: { x: 20, y: 10 },
+                    align: 'center'
+                }).setOrigin(0.5).setDepth(200);
+            }
+        }
+
+        // Battle Scene identique mais avec fix du bug undefined
+        class BattleScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BattleScene' });
+            }
+
+            init(data) {
+                this.enemyName = (data && data.enemyName) ? data.enemyName : 'Ennemi Inconnu';
+                this.enemyCompany = (data && data.enemyCompany) ? data.enemyCompany : 'Corp Inc.';
+                this.enemyHealth = (data && data.enemyHealth) ? data.enemyHealth : 50;
+                this.isBoss = (data && data.isBoss) ? data.isBoss : false;
+                this.enemySprite = (data && data.enemy) ? data.enemy : null;
+            }
+
+            create() {
+                this.playerChoice = null;
+                this.enemyChoice = null;
+                this.roundInProgress = false;
+                this.visionUsed = false;
+                this.nextEnemyMove = null;
+
+                this.add.rectangle(400, 300, 800, 600, 0x000000, 0.9);
+
+                // Citation de résistance en bas (plus visible)
+                const quote = Phaser.Math.RND.pick(GameConfig.resistanceQuotes);
+                this.resistanceQuote = this.add.text(400, 565, `💬 "${quote}"`, {
+                    fontSize: '13px',
+                    fill: '#0f0',
+                    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                    padding: { x: 15, y: 8 },
+                    align: 'center',
+                    wordWrap: { width: 750 },
+                    fontStyle: 'bold'
+                }).setOrigin(0.5).setDepth(1000);
+
+                const title = this.isBoss 
+                    ? `💀 BOSS: ${this.enemyName.toUpperCase()} (${this.enemyCompany}) 💀`
+                    : `💻 COMBAT: ${this.enemyName.toUpperCase()} 💻`;
+
+                this.add.text(400, 55, title, {
+                    fontSize: this.isBoss ? '22px' : '24px',
+                    fill: this.isBoss ? '#ff0000' : '#f00',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+
+                this.add.text(150, 100, '👤 Vous', {
+                    fontSize: '22px',
+                    fill: '#0f0'
+                });
+
+                this.playerHealthBar = this.add.rectangle(150, 135, GameConfig.playerData, 30, 0x00ff00);
+                this.playerHealthBar.setOrigin(0, 0.5);
+                this.playerHealthText = this.add.text(150, 160, `${GameConfig.playerData} données`, {
+                    fontSize: '16px',
+                    fill: '#0f0'
+                });
+
+                this.add.text(550, 100, `🏢 ${this.enemyName}`, {
+                    fontSize: '22px',
+                    fill: '#f00'
+                });
+
+                this.enemyHealthBar = this.add.rectangle(550, 135, this.enemyHealth * 2, 30, 0xff0000);
+                this.enemyHealthBar.setOrigin(0, 0.5);
+                this.enemyHealthText = this.add.text(550, 160, `${this.enemyHealth} PV`, {
+                    fontSize: '16px',
+                    fill: '#f00'
+                });
+
+                // Pas d'affichage de barre de données en combat (données = PV du joueur)
+
+                let statusY = 225;
+                if (GameConfig.attackBoostCount > 0) {
+                    this.boostIndicator = this.add.text(400, statusY, `⚡ BOOST x${GameConfig.attackBoostCount}`, {
+                        fontSize: '15px',
+                        fill: '#ff0',
+                        backgroundColor: '#333',
+                        padding: { x: 10, y: 5 }
+                    }).setOrigin(0.5);
+                    statusY += 25;
+                }
+                
+                if (GameConfig.visionPower) {
+                    this.visionIndicator = this.add.text(400, statusY, `🔮 VISION DISPONIBLE - Cliquez pour révéler !`, {
+                        fontSize: '15px',
+                        fill: '#a0f',
+                        backgroundColor: '#333',
+                        padding: { x: 10, y: 5 }
+                    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+                    
+                    this.visionIndicator.on('pointerdown', () => {
+                        if (GameConfig.visionPower && !this.visionUsed) {
+                            this.useVisionPower();
+                        }
+                    });
+                    statusY += 25;
+                }
+                
+                if (GameConfig.oneShotPower > 0) {
+                    this.oneShotIndicator = this.add.text(400, statusY, `💥 ONESHOT x${GameConfig.oneShotPower} - Cliquez pour OneShot !`, {
+                        fontSize: '15px',
+                        fill: '#f0f',
+                        backgroundColor: '#333',
+                        padding: { x: 10, y: 5 }
+                    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+                    
+                    this.oneShotIndicator.on('pointerdown', () => {
+                        if (GameConfig.oneShotPower > 0 && !this.roundInProgress) {
+                            this.useOneShot();
+                        }
+                    });
+                }
+
+                this.playerChoiceDisplay = this.add.text(200, 280, '', {
+                    fontSize: '48px'
+                }).setOrigin(0.5);
+
+                this.enemyChoiceDisplay = this.add.text(600, 280, '❓', {
+                    fontSize: '48px'
+                }).setOrigin(0.5);
+
+                this.battleLog = this.add.text(400, 350, `${this.enemyName} tente de pirater vos données !\nChoisissez votre défense cyber !`, {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: '#333',
+                    padding: { x: 20, y: 10 },
+                    align: 'center'
+                }).setOrigin(0.5);
+
+                this.createActionButtons();
+            }
+
+            createActionButtons() {
+                // Nouvelle citation avant les actions
+                const newQuote = Phaser.Math.RND.pick(GameConfig.resistanceQuotes);
+                if (this.resistanceQuote) {
+                    this.resistanceQuote.setText(`💬 "${newQuote}"`);
+                }
+                
+                const buttonY = 480;
+                const buttonWidth = 200;
+                const buttonHeight = 80;
+
+                const firewallBtn = this.add.rectangle(150, buttonY, buttonWidth, buttonHeight, 0x0088ff);
+                this.add.text(150, buttonY - 15, '🔐 FIREWALL', {
+                    fontSize: '20px',
+                    fill: '#fff',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(150, buttonY + 15, 'Bloque les virus', {
+                    fontSize: '14px',
+                    fill: '#ccc'
+                }).setOrigin(0.5);
+
+                firewallBtn.setInteractive({ useHandCursor: true });
+                firewallBtn.on('pointerdown', () => this.makeChoice('firewall'));
+                firewallBtn.on('pointerover', () => firewallBtn.setFillStyle(0x00aaff));
+                firewallBtn.on('pointerout', () => firewallBtn.setFillStyle(0x0088ff));
+
+                const virusBtn = this.add.rectangle(400, buttonY, buttonWidth, buttonHeight, 0xff0000);
+                this.add.text(400, buttonY - 15, '🐛 VIRUS', {
+                    fontSize: '20px',
+                    fill: '#fff',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(400, buttonY + 15, 'Infecte le système', {
+                    fontSize: '14px',
+                    fill: '#ccc'
+                }).setOrigin(0.5);
+
+                virusBtn.setInteractive({ useHandCursor: true });
+                virusBtn.on('pointerdown', () => this.makeChoice('virus'));
+                virusBtn.on('pointerover', () => virusBtn.setFillStyle(0xff3333));
+                virusBtn.on('pointerout', () => virusBtn.setFillStyle(0xff0000));
+
+                const exploitBtn = this.add.rectangle(650, buttonY, buttonWidth, buttonHeight, 0x00ff00);
+                this.add.text(650, buttonY - 15, '💉 EXPLOIT', {
+                    fontSize: '20px',
+                    fill: '#000',
+                    fontStyle: 'bold'
+                }).setOrigin(0.5);
+                this.add.text(650, buttonY + 15, 'Perce les défenses', {
+                    fontSize: '14px',
+                    fill: '#003300'
+                }).setOrigin(0.5);
+
+                exploitBtn.setInteractive({ useHandCursor: true });
+                exploitBtn.on('pointerdown', () => this.makeChoice('exploit'));
+                exploitBtn.on('pointerover', () => exploitBtn.setFillStyle(0x33ff33));
+                exploitBtn.on('pointerout', () => exploitBtn.setFillStyle(0x00ff00));
+            }
+
+            makeChoice(choice) {
+                if (this.roundInProgress) return;
+
+                // Afficher une nouvelle citation à chaque action
+                const newQuote = Phaser.Math.RND.pick(GameConfig.resistanceQuotes);
+                if (this.resistanceQuote) {
+                    this.resistanceQuote.setText(`💬 "${newQuote}"`);
+                }
+
+                this.roundInProgress = true;
+                this.playerChoice = choice;
+
+                const icons = { 'firewall': '🔐', 'virus': '🐛', 'exploit': '💉' };
+                this.playerChoiceDisplay.setText(icons[choice]);
+
+                const choices = ['firewall', 'virus', 'exploit'];
+                // Utiliser le coup prédit si vision active
+                if (this.nextEnemyMove) {
+                    this.enemyChoice = this.nextEnemyMove;
+                    this.nextEnemyMove = null;
+                } else {
+                    this.enemyChoice = Phaser.Math.RND.pick(choices);
+                }
+
+                this.battleLog.setText('Analyse en cours...');
+
+                this.time.delayedCall(1000, () => {
+                    this.enemyChoiceDisplay.setText(icons[this.enemyChoice]);
+                    this.resolveRound();
+                });
+            }
+
+            resolveRound() {
+                const p = this.playerChoice;
+                const e = this.enemyChoice;
+
+                let result = '';
+                let baseDamage = 20;
+                let damage = GameConfig.attackBoostCount > 0 ? Math.floor(baseDamage * 1.5) : baseDamage;
+                let dataLoss = 15;
+
+                if (p === e) {
+                    result = '⚖️ ÉGALITÉ ! Aucun dégât !';
+                } else if (
+                    (p === 'firewall' && e === 'virus') ||
+                    (p === 'virus' && e === 'exploit') ||
+                    (p === 'exploit' && e === 'firewall')
+                ) {
+                    this.enemyHealth -= damage;
+                    this.enemyHealthBar.setSize(Math.max(0, this.enemyHealth * 2), 30);
+                    this.enemyHealthText.setText(`${this.enemyHealth} PV`);
+
+                    const messages = {
+                        'firewall-virus': '🔐 Votre FIREWALL bloque le VIRUS !',
+                        'virus-exploit': '🐛 Votre VIRUS infecte l\'EXPLOIT !',
+                        'exploit-firewall': '💉 Votre EXPLOIT perce le FIREWALL !'
+                    };
+                    result = `✅ ${messages[`${p}-${e}`]}\n${this.enemyName} perd ${damage} données !`;
+                    
+                    if (GameConfig.attackBoostCount > 0) {
+                        result += '\n⚡ Boost utilisé !';
+                        GameConfig.attackBoostCount -= 1;
+                        // Actualiser l'UI du boost
+                        if (this.boostIndicator) {
+                            if (GameConfig.attackBoostCount > 0) {
+                                this.boostIndicator.setText(`⚡ BOOST x${GameConfig.attackBoostCount}`);
+                            } else {
+                                this.boostIndicator.setText('');
+                            }
+                        }
+                    }
+                } else {
+                    GameConfig.playerData -= damage;
+                    this.playerHealthBar.setSize(Math.max(0, GameConfig.playerData), 30);
+                    this.playerHealthText.setText(`${GameConfig.playerData} données`);
+
+                    const messages = {
+                        'firewall-exploit': `💉 L'EXPLOIT de ${this.enemyName || 'l\'adversaire'} perce votre FIREWALL !`,
+                        'virus-firewall': `🔐 Le FIREWALL de ${this.enemyName || 'l\'adversaire'} bloque votre VIRUS !`,
+                        'exploit-virus': `🐛 Le VIRUS de ${this.enemyName || 'l\'adversaire'} infecte votre EXPLOIT !`
+                    };
+                    const taunt = Phaser.Math.RND.pick([
+                        "Ils volent vos données !",
+                        "La surveillance continue...",
+                        "Vos infos sont exposées !",
+                        "Big Data vous traque !"
+                    ]);
+                    result = `❌ ${messages[`${e}-${p}`]}\nVous perdez ${damage} données !\n💬 ${taunt}`;
+                }
+
+                this.battleLog.setText(result);
+
+                this.time.delayedCall(2000, () => {
+                    if (this.enemyHealth <= 0) {
+                        this.victory();
+                    } else if (GameConfig.playerData <= 0) {
+                        this.defeat();
+                    } else {
+                        this.playerChoiceDisplay.setText('');
+                        this.enemyChoiceDisplay.setText('❓');
+                        this.battleLog.setText(`Round suivant !\nChoisissez votre attaque cyber !`);
+                        this.roundInProgress = false;
+                    }
+                });
+            }
+
+            victory() {
+                const msg = this.isBoss ? `🎉 BOSS VAINCU ! ${this.enemyName} est défait !` : `✅ Victoire contre ${this.enemyName} !`;
+                this.battleLog.setText(msg);
+                this.time.delayedCall(2000, () => {
+                    this.returnToMainScene(true);
+                });
+            }
+
+            defeat() {
+                const defeatQuote = Phaser.Math.RND.pick([
+                    "Les GAFAM ont gagné... cette fois.",
+                    "Vos données sont perdues... Windows a gagné.",
+                    "La surveillance de masse triomphe...",
+                    "Big Brother vous surveille désormais.",
+                    "Vous êtes devenu le produit, pas le client."
+                ]);
+                this.battleLog.setText(`💀 DÉFAITE !\n${defeatQuote}\nGame Over...`);
+                this.time.delayedCall(3000, () => {
+                    location.reload();
+                });
+            }
+
+            useVisionPower() {
+                if (!this.roundInProgress) {
+                    // Générer le prochain coup de l'ennemi
+                    const choices = ['firewall', 'virus', 'exploit'];
+                    const nextMove = Phaser.Math.RND.pick(choices);
+                    const icons = { 'firewall': '🔐', 'virus': '🐛', 'exploit': '💉' };
+                    const names = { 'firewall': 'FIREWALL', 'virus': 'VIRUS', 'exploit': 'EXPLOIT' };
+                    
+                    this.battleLog.setText(`🔮 VISION ACTIVÉE !\nLe prochain coup sera : ${icons[nextMove]} ${names[nextMove]} !\nChoisissez judicieusement...`);
+                    
+                    // Forcer le prochain coup ennemi
+                    this.nextEnemyMove = nextMove;
+                    this.visionUsed = true;
+                    GameConfig.visionPower = false;
+                    
+                    if (this.visionIndicator) {
+                        this.visionIndicator.setStyle({ fill: '#666' });
+                        this.visionIndicator.setText('🔮 VISION UTILISÉE');
+                        this.visionIndicator.disableInteractive();
+                    }
+                }
+            }
+
+            useOneShot() {
+                this.roundInProgress = true;
+                GameConfig.oneShotPower -= 1;
+                
+                // Mettre à jour l'affichage du oneshot
+                if (this.oneShotIndicator) {
+                    if (GameConfig.oneShotPower > 0) {
+                        this.oneShotIndicator.setText(`💥 ONESHOT x${GameConfig.oneShotPower} - Cliquez pour OneShot !`);
+                    } else {
+                        this.oneShotIndicator.setText('💥 ONESHOT UTILISÉ');
+                        this.oneShotIndicator.disableInteractive();
+                    }
+                }
+                
+                this.battleLog.setText(`💥 ONESHOT ACTIVÉ !\n${this.enemyName} est vaincu instantanément !`);
+                
+                this.time.delayedCall(2000, () => {
+                    this.victory();
+                });
+            }
+
+            returnToMainScene(victory) {
+                const mainScene = this.scene.get('MainScene');
+                this.scene.stop();
+                this.scene.resume('MainScene');
+                // Passer l'ennemi correctement (créer un objet avec la gridPos si nécessaire)
+                if (this.enemySprite) {
+                    mainScene.endBattle(victory, this.enemySprite);
+                } else {
+                    // Fallback: chercher l'ennemi à partir du nom dans la scène
+                    const enemy = mainScene.enemies.find(e => e.enemyName === this.enemyName);
+                    mainScene.endBattle(victory, enemy);
+                }
+            }
+        }
+
+        // Lancement du jeu
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-canvas',
+            backgroundColor: '#1a1a2e',
+            scene: [BootScene, MainScene, BattleScene]
+        };
+
+        console.log('Lancement de Data Guardian...');
+        const game = new Phaser.Game(config);
+        
+        // Vérifier que l'élément existe avant de modifier
+        const statusElement = document.getElementById('game-status');
+        if (statusElement) {
+            statusElement.textContent = 'Jeu chargé ! Utilisez les flèches pour vous déplacer case par case.';
+        }
+    </script>
+{% endblock %}
