@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - PhpSquad Game{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/home.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">PhpSquad Adventure</h1>
+            <p class="hero-subtitle">Plongez dans une aventure épique et relevez les défis</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">Jouer Maintenant</a>
+                <a href="#" class="btn btn-secondary">En savoir plus</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="{{ asset('images/game-hero.png') }}" alt="Game Hero">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Caractéristiques du Jeu</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3>Gameplay Unique</h3>
+                <p>Une expérience de jeu immersive avec des mécaniques innovantes</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Monde Ouvert</h3>
+                <p>Explorez un univers vaste et détaillé rempli de secrets</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>Combats Épiques</h3>
+                <p>Affrontez des ennemis redoutables dans des batailles stratégiques</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3>Défis & Récompenses</h3>
+                <p>Accomplissez des quêtes et débloquez des récompenses exclusives</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Prêt à commencer l'aventure ?</h2>
+            <p>Rejoignez des milliers de joueurs dans cette expérience unique</p>
+            <a href="#" class="btn btn-cta">Commencer Maintenant</a>
+        </div>
+    </section>
+</main>
+{% endblock %}
