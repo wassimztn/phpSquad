@@ -8,8 +8,27 @@
         body {
             margin: 0;
             padding: 0;
-            background: #000;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 25%, #0f1b3c 50%, #1a0f2e 75%, #0a0e27 100%);
+            background-attachment: fixed;
             font-family: 'Courier New', monospace;
+            color: #0f0;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 100, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 200, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+            pointer-events: none;
+            z-index: 0;
         }
         .game-container {
             display: flex;
@@ -18,13 +37,18 @@
             justify-content: center;
             min-height: 100vh;
             color: #0f0;
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            gap: 20px;
         }
         #game-canvas {
             border: 3px solid #0f0;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            padding: 10px;
         }
         .game-info {
-            margin-top: 20px;
+            margin-top: 0;
             text-align: center;
             background: rgba(0, 20, 0, 0.8);
             padding: 20px;
