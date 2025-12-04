@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AuthController extends AbstractController
 {
@@ -66,7 +67,8 @@ class AuthController extends AbstractController
     #[Route('/login/verify', name: 'app_login_verify', methods: ['POST'])]
     public function loginVerify(
         Request $request,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        SessionInterface $session
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         
@@ -87,12 +89,21 @@ class AuthController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Combo incorrect !'], 401);
         }
 
-        // Ici tu pourrais mettre l'utilisateur en session
-        // Pour l'instant on retourne juste un succès
+        // Mettre l'utilisateur en session
+        $session->set('user_id', $user->getId());
+        $session->set('user_email', $user->getEmail());
+
         return new JsonResponse([
             'success' => true, 
             'message' => 'Authentification réussie !',
             'redirect' => $this->generateUrl('app_game')
         ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(SessionInterface $session): Response
+    {
+        $session->clear();
+        return $this->redirectToRoute('app_main');
     }
 }
