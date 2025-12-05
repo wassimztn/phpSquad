@@ -9,6 +9,7 @@
             <li><a href="{{ path('app_main') }}">Accueil</a></li>
             <li><a href="{{ path('app_3d_dashboard') }}">3D</a></li>
             <li><a href="{{ path('app_contact') }}">Contact</a></li>
+            <li><a href="{{ path('app_frustrant_input') }}">Frustrant Input</a></li>
             {% if app.session.get('user_email') %}
                 <li><a href="{{ path('app_logout') }}" class="btn-auth">🚪 {{ app.session.get('user_email') }} - Logout</a></li>
             {% else %}
