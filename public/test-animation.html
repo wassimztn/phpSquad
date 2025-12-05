@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #111;
+            border: 1px solid #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #0c0;
+        }
+
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 30, 60, 0.9) 0%, rgba(5, 10, 30, 0.95) 100%);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .victory-overlay.active {
+            display: flex;
+        }
+
+        .character-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .hero-display {
+            position: relative;
+            width: 500px;
+            height: 400px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ryu-sprite {
+            position: absolute;
+            width: 140px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: ryuShoryuken 1.2s ease-out 0.4s;
+            background: 
+                /* Cheveux */
+                radial-gradient(ellipse 60px 45px at 50% 18%, #1a0000 0%, #1a0000 100%),
+                /* Tête peau */
+                radial-gradient(circle 35px at 50% 45%, #f5d5b8 0%, #e6b896 100%),
+                /* Yeux gauche */
+                radial-gradient(circle 6px at 38% 42%, #000 0%, #000 100%),
+                /* Yeux droit */
+                radial-gradient(circle 6px at 62% 42%, #000 0%, #000 100%),
+                /* Gi rouge corps */
+                linear-gradient(135deg, #d41a1a 0%, #a00 100%),
+                /* Ceinture noire */
+                linear-gradient(90deg, #000 40%, #000 60%),
+                /* Pantalon blanc */
+                linear-gradient(90deg, #ddd 0%, #fff 100%);
+            background-size:
+                120px 80px,
+                70px 70px,
+                10px 10px,
+                10px 10px,
+                140px 100px,
+                140px 20px,
+                140px 70px;
+            background-position:
+                50% 8%,
+                50% 32%,
+                33% 38%,
+                67% 38%,
+                0 42%,
+                0 58%,
+                0 68%;
+            background-repeat: no-repeat;
+        }
+        
+        /* Bras gauche */
+        .ryu-sprite::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 25px;
+            background: #f5d5b8;
+            border-radius: 12px;
+            left: -25px;
+            top: 45px;
+            transform: rotate(-35deg);
+            box-shadow: -20px 10px 0 -8px #f5d5b8;
+        }
+        
+        @keyframes ryuShoryuken {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5) translateY(50px);
+            }
+            30% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) translateY(0);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-100px) scaleY(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateY(0) scaleY(1);
+            }
+        }
+
+        /* Vague d'énergie du Shoryuken */
+        .shoryuken-wave {
+            position: absolute;
+            width: 100px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(255, 100, 0, 0.8) 0%, rgba(255, 200, 0, 0.4) 100%);
+            border: 3px solid rgba(255, 150, 0, 0.9);
+            border-radius: 50% 50% 30% 30%;
+            top: 100px;
+            left: 150px;
+            animation: waveRise 1s ease-out 0.7s forwards;
+            opacity: 0;
+            filter: drop-shadow(0 0 20px rgba(255, 150, 0, 0.9));
+            transform: rotate(-15deg);
+        }
+        
+        @keyframes waveRise {
+            0% {
+                opacity: 1;
+                transform: rotate(-15deg) translateY(0) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: rotate(-15deg) translateY(-150px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: rotate(-15deg) translateY(-300px) scale(1.2);
+            }
+        }
+
+        /* Particules de feu */
+        .fire-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ffff00, #ff6600);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            animation: fireExplode 0.9s ease-out 0.8s forwards;
+            opacity: 0;
+            filter: drop-shadow(0 0 8px rgba(255, 150, 0, 0.9));
+            box-shadow: 0 0 12px rgba(255, 150, 0, 0.8);
+            margin: -5px 0 0 -5px;
+        }
+        
+        @keyframes fireExplode {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* Impact circulaire */
+        .impact-ring {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255, 150, 0, 0.8);
+            border-radius: 50%;
+            top: 100px;
+            left: 160px;
+            animation: impactExpand 0.8s ease-out 0.75s forwards;
+            opacity: 0;
+        }
+        
+        @keyframes impactExpand {
+            0% {
+                opacity: 1;
+                width: 80px;
+                height: 80px;
+                box-shadow: 0 0 15px rgba(255, 150, 0, 0.8);
+            }
+            100% {
+                opacity: 0;
+                width: 200px;
+                height: 200px;
+                box-shadow: 0 0 5px rgba(255, 150, 0, 0.2);
+            }
+        }
+
+        .text-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .victory-text {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ffaa00;
+            text-shadow: 
+                0 0 20px #ffaa00,
+                0 0 40px rgba(255, 150, 0, 0.8);
+            font-family: Arial, sans-serif;
+            letter-spacing: 2px;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            animation: textSlide 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.5s forwards;
+        }
+        
+        @keyframes textSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .victory-subtext {
+            font-size: 1.2rem;
+            color: #ff6600;
+            text-shadow: 0 0 10px #ff6600;
+            font-family: 'Courier New', monospace;
+            margin-top: 15px;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: textSlide 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.8s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1>🎮 Test Animation</h1>
+        <button onclick="showAnimation()">Show Victory Animation</button>
+        <button onclick="hideAnimation()">Hide Animation</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Status</h2>
+        <p id="status">Ready</p>
+    </div>
+
+    <!-- Animation de victoire -->
+    <div class="victory-overlay" id="victoryOverlay">
+        <div class="character-container">
+            <div class="hero-display">
+                <div class="ryu-sprite"></div>
+                
+                <!-- Effets du Shoryuken -->
+                <div class="impact-ring"></div>
+                <div class="shoryuken-wave"></div>
+                <div id="fireContainer"></div>
+            </div>
+            
+            <div class="text-container">
+                <h2 class="victory-text">🔥 SHORYUKEN ! 🔥</h2>
+                <p class="victory-subtext">Accès Autorisé - Bienvenue !</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAnimation() {
+            console.log('showAnimation called');
+            const overlay = document.getElementById('victoryOverlay');
+            console.log('Overlay element:', overlay);
+            overlay.classList.add('active');
+            console.log('Active class added');
+            
+            // Clear previous particles
+            const fireContainer = document.getElementById('fireContainer');
+            fireContainer.innerHTML = '';
+            
+            // Ajouter les particules de feu
+            const fireCount = 15;
+            
+            for (let i = 0; i < fireCount; i++) {
+                const fire = document.createElement('div');
+                fire.className = 'fire-particle';
+                
+                const angle = (Math.PI * 2 * i) / fireCount;
+                const distance = 140;
+                const tx = Math.cos(angle) * distance;
+                const ty = -Math.sin(angle) * distance - 100;
+                
+                fire.style.setProperty('--tx', `${tx}px`);
+                fire.style.setProperty('--ty', `${ty}px`);
+                fire.style.animationDelay = `${0.8 + (i * 0.04)}s`;
+                
+                fireContainer.appendChild(fire);
+                console.log('Fire particle created:', i);
+            }
+            console.log('Animation complete');
+            document.getElementById('status').innerText = 'Animation showing - should see Ryu with effects';
+        }
+
+        function hideAnimation() {
+            console.log('hideAnimation called');
+            const overlay = document.getElementById('victoryOverlay');
+            overlay.classList.remove('active');
+            document.getElementById('status').innerText = 'Animation hidden';
+        }
+
+        window.addEventListener('load', function() {
+            document.getElementById('status').innerText = 'Page loaded - click "Show Victory Animation" to test';
+        });
+    </script>
+</body>
+</html>

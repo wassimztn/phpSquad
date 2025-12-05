@@ -340,6 +340,12 @@
             return;
         }
         
+        // Limite maximale de 20 caractères
+        if (comboKeys.length >= 20) {
+            e.preventDefault();
+            return;
+        }
+        
         // Empêcher le comportement par défaut
         e.preventDefault();
         
