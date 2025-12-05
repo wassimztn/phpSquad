@@ -1,0 +1,173 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Champ de saisie volontairement frustrant{% endblock %}
+
+{% block body %}
+<div class="frustrant-container">
+    <h1>Entrez votre date de naissance (JJMMYYYY) 🎂</h1>
+    <p class="info">Chaque chiffre apparaîtra après avoir répondu correctement aux questions.</p>
+
+    <form id="frustrant-form" method="POST">
+        <!-- Champ caché pour accumuler la date -->
+        <input type="hidden" id="date_naissance" name="date_naissance" value="">
+        
+        <!-- Affichage de la date progressivement -->
+        <div class="date-display">
+            <span id="date-output">_ _ _ _ _ _ _ _</span>
+        </div>
+
+        <!-- Conteneur des questions -->
+        <div id="quiz-container">
+            <!-- Question 1 - Digit 0 -->
+            <div class="question" data-digit="0" style="display: block;">
+                <p class="question-title">1️⃣ Quelle alternative libre à Windows ?</p>
+                <div class="answers" id="answers-0">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 2 - Digit 1 -->
+            <div class="question" data-digit="1" style="display: none;">
+                <p class="question-title">2️⃣ Quel réseau social collecte massivement les données ?</p>
+                <div class="answers" id="answers-1">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 3 - Digit 2 -->
+            <div class="question" data-digit="2" style="display: none;">
+                <p class="question-title">3️⃣ Quel est le symbole international du logiciel libre ?</p>
+                <div class="answers" id="answers-2">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 4 - Digit 3 -->
+            <div class="question" data-digit="3" style="display: none;">
+                <p class="question-title">4️⃣ Combien de principaux GAFAM y a-t-il ?</p>
+                <div class="answers" id="answers-3">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 5 - Digit 4 -->
+            <div class="question" data-digit="4" style="display: none;">
+                <p class="question-title">5️⃣ Qui a inventé le World Wide Web ?</p>
+                <div class="answers" id="answers-4">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 6 - Digit 5 -->
+            <div class="question" data-digit="5" style="display: none;">
+                <p class="question-title">6️⃣ Quel OS est développé par la Fondation Linux ?</p>
+                <div class="answers" id="answers-5">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 7 - Digit 6 -->
+            <div class="question" data-digit="6" style="display: none;">
+                <p class="question-title">7️⃣ Quel langage est un pilier du web moderne ?</p>
+                <div class="answers" id="answers-6">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+
+            <!-- Question 8 - Digit 7 -->
+            <div class="question" data-digit="7" style="display: none;">
+                <p class="question-title">8️⃣ Quel protocole chiffre les données en transit ?</p>
+                <div class="answers" id="answers-7">
+                    <!-- Les 80 boutons seront générés par JavaScript -->
+                </div>
+                <div class="digit-input-wrapper" style="display: none;">
+                    <p class="digit-prompt">Entrez votre chiffre :</p>
+                    <input type="text" class="digit-input" maxlength="1" inputmode="numeric" placeholder="?">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <button type="submit" id="submit-btn" class="submit-btn" disabled>
+            Valider la date
+        </button>
+    </form>
+
+    <!-- Message de résultat -->
+    {% if result %}
+        <div class="result-message {% if submitted %}success{% else %}error{% endif %}">
+            {{ result }}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Vidéo de surprise : remplacerez videos/surprise.mp4 par la vôtre dans public/videos/ -->
+<!-- Conteneur de la surprise vidéo : fond flouté (zoomé) + vidéo principale en object-fit:contain -->
+<div id="surprise-container" aria-hidden="true">
+    <video id="surprise-bg-video" class="surprise-bg" playsinline autoplay muted loop preload="auto" src="{{ asset('videos/surprise.mp4') }}"></video>
+    <video id="surprise-video" class="surprise-main" playsinline preload="auto" src="{{ asset('videos/surprise.mp4') }}"></video>
+</div>
+
+<!-- Overlay demandant l'autorisation sonore avant de commencer le quiz -->
+<div id="sound-consent" class="sound-consent">
+    <div class="sound-consent-card">
+        <h2>Activer le son pour la surprise ? 🔊</h2>
+        <p>Si vous autorisez le son, la vidéo de surprise jouera avec audio lorsqu'une mauvaise réponse sera choisie.</p>
+        <div class="sound-consent-actions">
+            <button id="allow-sound-btn" class="btn-allow" onclick="handleAllowSound(event)">Autoriser le son</button>
+            <button id="deny-sound-btn" class="btn-deny" onclick="handleDenySound(event)">Continuer sans son</button>
+        </div>
+    </div>
+</div>
+
+{# expose la liste des vidéos détectées par le contrôleur pour que le JS choisisse au hasard #}
+<script>
+    window.surpriseVideos = [
+    {% for f in videos %}
+        "{{ asset('videos/' ~ f) }}"{% if not loop.last %},{% endif %}
+    {% else %}
+        "{{ asset('videos/surprise.mp4') }}"
+    {% endfor %}
+    ];
+</script>
+
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/frustrant.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Use the non-built public script during development so changes are immediate #}
+    <script src="/champ_frustrant.js" defer></script>
+{% endblock %}
