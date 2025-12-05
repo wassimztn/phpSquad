@@ -44,12 +44,25 @@ header .nav-links {
     display: flex;
     list-style: none;
     gap: 2rem;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+header .nav-links li {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 header .nav-links a {
     color: white;
     text-decoration: none;
     transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
 }
 
 header .nav-links a:hover {

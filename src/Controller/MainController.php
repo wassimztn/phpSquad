@@ -17,4 +17,10 @@ final class MainController extends AbstractController
             'user_email' => $session->get('user_email'),
         ]);
     }
+
+    #[Route('/secret', name: 'app_secret')]
+    public function secret(): Response
+    {
+        return $this->render('main/secret.html.twig');
+    }
 }
