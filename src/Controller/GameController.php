@@ -6,12 +6,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class GameController extends AbstractController
 {
     #[Route('/game/dataguardian', name: 'app_game')]
     public function index(SessionInterface $session): Response
     {
+        // Vérifier que l'utilisateur est connecté
+        if (!$session->get('user_id')) {
+            $session->set('auth_message', 'Vous devez être connecté pour jouer !');
+            return new RedirectResponse($this->generateUrl('app_login'));
+        }
+        
         return $this->render('game/index.html.twig', [
             'controller_name' => 'GameController',
             'user_email' => $session->get('user_email'),

@@ -911,7 +911,7 @@
                 
                 setTimeout(() => {
                     window.location.href = '/main';
-                }, 4000);
+                }, 1900);
             } else {
                 comboDisplayClean.classList.add('incorrect');
                 comboStatus.textContent = '❌ COMBO INCORRECT !';
@@ -967,7 +967,7 @@
                     console.log('GIF frozen after first loop');
                 };
                 img.src = '/images/ken.gif';
-            }, 1800); // Freeze after first GIF loop (~1.8s)
+            }, 1600); // Freeze after first GIF loop completes
         }
         console.log('Animation complete');
     }
