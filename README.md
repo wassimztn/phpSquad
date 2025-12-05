@@ -31,6 +31,9 @@ Dirigez-vous vers la page de contact et preparez-vous à communiquer avec les é
 ### On veut du gros pixel !
 Notre systeme de connexion et notre jeu sont OLD-SCHOOL !
 
+### STL Vision
+Découvrez notre système de Visionnage 3D
+
 ## Fonctionnalités
 
 ### Système d'Authentification
