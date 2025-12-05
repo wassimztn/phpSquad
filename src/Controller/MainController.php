@@ -26,6 +26,8 @@ final class MainController extends AbstractController
     public function secret(): Response
     {
         return $this->render('main/secret.html.twig');
+    }
+
     #[Route('/contact', name: 'app_contact', methods: ['GET', 'POST'])]
     public function contact(Request $request, MailerInterface $mailer): Response|JsonResponse
     {
