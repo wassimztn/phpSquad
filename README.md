@@ -337,6 +337,8 @@ Pour toute question ou bug, veuillez :
 ## Contributeurs
 
 - **Marius Wartel** - Développeur principal
+- **Wassim Zitoun** - Developpeur principal
+- **Rayan Arabi** - Développeur principal
 - **Team phpSquad** - NuitInfo 2025
 
 ## Licence
