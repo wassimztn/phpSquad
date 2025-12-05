@@ -12,7 +12,8 @@ let dateValue = '';
 let currentQuestionIndex = 0;
 
 // Flag indiquant si l'utilisateur a autorisé le son
-let allowSound = false;
+// On autorise automatiquement le son (suppression de la demande manuelle)
+let allowSound = true;
 
 const questions = document.querySelectorAll('.question');
 const totalQuestions = questions.length;

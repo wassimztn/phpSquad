@@ -11,7 +11,8 @@ const submitBtn = document.getElementById('submit-btn');
 let dateValue = '';
 let currentDigitIndex = 0;
 // Flag indiquant si l'utilisateur a autorisé le son
-let allowSound = false;
+// Autoriser le son automatiquement (plus de demande à l'utilisateur)
+let allowSound = true;
 
 // Récupère toutes les questions
 const questions = document.querySelectorAll('.question');

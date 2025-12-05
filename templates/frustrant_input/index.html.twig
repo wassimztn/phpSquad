@@ -136,17 +136,7 @@
     <video id="surprise-video" class="surprise-main" playsinline preload="auto" src="{{ asset('videos/surprise.mp4') }}"></video>
 </div>
 
-<!-- Overlay demandant l'autorisation sonore avant de commencer le quiz -->
-<div id="sound-consent" class="sound-consent">
-    <div class="sound-consent-card">
-        <h2>Activer le son pour la surprise ? 🔊</h2>
-        <p>Si vous autorisez le son, la vidéo de surprise jouera avec audio lorsqu'une mauvaise réponse sera choisie.</p>
-        <div class="sound-consent-actions">
-            <button id="allow-sound-btn" class="btn-allow" onclick="handleAllowSound(event)">Autoriser le son</button>
-            <button id="deny-sound-btn" class="btn-deny" onclick="handleDenySound(event)">Continuer sans son</button>
-        </div>
-    </div>
-</div>
+{# Le consentement sonore a été supprimé : le son est activé automatiquement par défaut #}
 
 {# expose la liste des vidéos détectées par le contrôleur pour que le JS choisisse au hasard #}
 <script>
