@@ -1145,6 +1145,26 @@ function triggerVictoryCelebration() {
     triggerStarBurst();
 }
 
+function triggerFireworks() {
+    const fw = document.createElement('div');
+    fw.className = 'firework-explosion';
+    fw.style.left = Math.random() * 100 + '%';
+    fw.style.top = Math.random() * 80 + '%';
+    
+    // Create firework particles
+    for(let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework-particle';
+        const angle = (Math.PI * 2 * i) / 30;
+        particle.style.setProperty('--angle', angle + 'rad');
+        particle.style.backgroundColor = getRandomColor();
+        fw.appendChild(particle);
+    }
+    
+    effectsContainer.appendChild(fw);
+    setTimeout(() => fw.remove(), 2000);
+}
+
 function triggerSparkles(element) {
     const rect = element.getBoundingClientRect();
     for(let i = 0; i < 5; i++) {
