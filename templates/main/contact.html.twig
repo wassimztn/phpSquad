@@ -1,0 +1,1815 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact - Une Expérience Unique{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/contact.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="contact-universe">
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    
+    <div class="contact-container">
+        <div class="contact-header">
+            <h1 class="glitch" data-text="CONTACTEZ-NOUS">CONTACTEZ-NOUS</h1>
+            <p class="subtitle">Préparez-vous à recevoir le message qui changera tout...</p>
+            <div class="cosmic-line"></div>
+        </div>
+
+        <form id="contactForm" class="contact-form" method="post" action="{{ path('app_contact') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact') }}">
+            
+            <div class="form-group floating-label">
+                <input type="text" id="name" name="name" required class="form-input" placeholder=" ">
+                <label for="name" class="label-float">
+                    <span class="label-icon">👤</span> Votre Identité Cosmique
+                </label>
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="form-group floating-label">
+                <input type="email" id="email" name="email" required class="form-input" placeholder=" ">
+                <label for="email" class="label-float">
+                    <span class="label-icon">📧</span> Canal de Transmission Intergalactique
+                </label>
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="form-group floating-label">
+                <input type="text" id="subject" name="subject" required class="form-input" placeholder=" ">
+                <label for="subject" class="label-float">
+                    <span class="label-icon">💫</span> Sujet de Votre Transmission
+                </label>
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="form-group floating-label">
+                <textarea id="message" name="message" required class="form-input form-textarea" placeholder=" " rows="6"></textarea>
+                <label for="message" class="label-float">
+                    <span class="label-icon">✨</span> Votre Message Transcendantal
+                </label>
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="cosmic-checkbox">
+                    <input type="checkbox" name="newsletter" id="newsletter">
+                    <span class="checkbox-custom"></span>
+                    <span class="checkbox-label">Je souhaite rejoindre la galaxie des élus et recevoir les transmissions secrètes</span>
+                </label>
+            </div>
+
+            <div class="button-container">
+                <button type="submit" class="cosmic-button">
+                    <span class="button-text">ENVOYER DANS L'UNIVERS</span>
+                    <span class="button-icon">🚀</span>
+                    <div class="button-particles"></div>
+                </button>
+            </div>
+        </form>
+
+        <div class="contact-info">
+            <div class="info-card">
+                <div class="info-icon">🌍</div>
+                <h3>Notre Base Terrestre</h3>
+                <p>Quelque part sur la planète Terre</p>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">⏰</div>
+                <h3>Disponibilité</h3>
+                <p>24/7 - À travers l'espace-temps</p>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">⚡</div>
+                <h3>Temps de Réponse</h3>
+                <p>Plus rapide que la lumière</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup de confirmation -->
+<div id="successPopup" class="popup-overlay">
+    <div class="popup-container">
+        <div class="popup-stars"></div>
+        <div class="success-icon-container">
+            <div class="success-checkmark">
+                <div class="check-icon">
+                    <span class="icon-line line-tip"></span>
+                    <span class="icon-line line-long"></span>
+                    <div class="icon-circle"></div>
+                    <div class="icon-fix"></div>
+                </div>
+            </div>
+        </div>
+        <h2 class="popup-title">🎉 TRANSMISSION RÉUSSIE ! 🎉</h2>
+        <div class="popup-message">
+            <p class="message-main">Votre message a traversé l'espace-temps avec succès !</p>
+            <p class="message-sub">Nos agents cosmiques l'ont bien reçu et préparent déjà la réponse...</p>
+            <div class="prophecy-box">
+                <div class="prophecy-icon">🔮</div>
+                <p class="prophecy-text">
+                    Qui sait ? Peut-être que le prochain message que vous recevrez sera :<br>
+                    <span class="golden-text">"Félicitations, vous avez gagné !"</span>
+                </p>
+            </div>
+        </div>
+        <div class="popup-animation">
+            <div class="rocket">🚀</div>
+            <div class="planet">🪐</div>
+            <div class="satellite">🛸</div>
+        </div>
+        <button class="popup-close" onclick="closePopup()">
+            <span>Retour à la Réalité</span>
+            <span class="close-icon">✨</span>
+        </button>
+        <div class="confetti-container"></div>
+    </div>
+</div>
+
+<script>
+// Create effects container
+const effectsContainer = document.createElement('div');
+effectsContainer.className = 'effects-container';
+document.body.appendChild(effectsContainer);
+
+// Create mega effects container for validation
+const megaEffectsContainer = document.createElement('div');
+megaEffectsContainer.className = 'mega-effects-container';
+document.body.appendChild(megaEffectsContainer);
+
+// Track typing state
+let isTyping = false;
+let deleteTimeout = null;
+let lastInputLength = {};
+let particleInterval = null;
+
+// Initialize input lengths
+document.querySelectorAll('.form-input').forEach(input => {
+    lastInputLength[input.id] = 0;
+});
+
+// ============================================
+// CONTINUOUS INFINITE ANIMATIONS
+// ============================================
+
+// Start continuous animations on page load
+startContinuousAnimations();
+
+function startContinuousAnimations() {
+    // Continuous flying objects
+    setInterval(() => {
+        triggerFlyingObject();
+    }, 2000);
+    
+    // Continuous floating emojis
+    setInterval(() => {
+        triggerFloatingEmoji();
+    }, 3000);
+    
+    // Random UFO sightings
+    setInterval(() => {
+        if(Math.random() > 0.5) triggerUFOSighting();
+    }, 5000);
+    
+    // Random dragons
+    setInterval(() => {
+        if(Math.random() > 0.6) triggerDragon();
+    }, 7000);
+    
+    // Meteor showers
+    setInterval(() => {
+        triggerMeteorShower();
+    }, 10000);
+    
+    // Lightning strikes
+    setInterval(() => {
+        if(Math.random() > 0.7) triggerLightningBolt();
+    }, 4000);
+    
+    // Rainbow waves
+    setInterval(() => {
+        if(Math.random() > 0.8) triggerRainbowWave();
+    }, 8000);
+    
+    // Floating sparkles everywhere
+    setInterval(() => {
+        triggerRandomSparkles();
+    }, 1500);
+    
+    // Energy pulses
+    setInterval(() => {
+        triggerEnergyPulse();
+    }, 3500);
+    
+    // Portal glimpses
+    setInterval(() => {
+        if(Math.random() > 0.85) triggerPortalGlimpse();
+    }, 6000);
+    
+    // Screen glitches
+    setInterval(() => {
+        if(Math.random() > 0.7) triggerRandomGlitch();
+    }, 5000);
+    
+    // Shooting stars
+    setInterval(() => {
+        triggerShootingStar();
+    }, 4500);
+    
+    // Cosmic dust
+    setInterval(() => {
+        triggerCosmicDust();
+    }, 2500);
+    
+    // Floating orbs
+    setInterval(() => {
+        triggerFloatingOrb();
+    }, 3500);
+    
+    // Laser beams
+    setInterval(() => {
+        if(Math.random() > 0.75) triggerLaserBeam();
+    }, 6000);
+    
+    // Hologram effects
+    setInterval(() => {
+        triggerHologramEffect();
+    }, 7500);
+    
+    // Dimension rifts
+    setInterval(() => {
+        if(Math.random() > 0.8) triggerDimensionRift();
+    }, 9000);
+    
+    // NEW MEGA EFFECTS
+    // Spiral vortex
+    setInterval(() => {
+        triggerSpiralVortex();
+    }, 6000);
+    
+    // Neon trails
+    setInterval(() => {
+        triggerNeonTrail();
+    }, 2000);
+    
+    // Particle explosions
+    setInterval(() => {
+        triggerParticleExplosion();
+    }, 4000);
+    
+    // Floating text
+    setInterval(() => {
+        triggerFloatingText();
+    }, 5000);
+    
+    // Color bombs
+    setInterval(() => {
+        triggerColorBomb();
+    }, 8000);
+    
+    // Plasma waves
+    setInterval(() => {
+        triggerPlasmaWave();
+    }, 7000);
+    
+    // Digital rain
+    setInterval(() => {
+        triggerDigitalRain();
+    }, 10000);
+    
+    // Spiral galaxies
+    setInterval(() => {
+        triggerSpiralGalaxy();
+    }, 12000);
+    
+    // Neon rings
+    setInterval(() => {
+        triggerNeonRings();
+    }, 3000);
+    
+    // Bubble burst
+    setInterval(() => {
+        triggerBubbleBurst();
+    }, 5500);
+    
+    // Electric arcs
+    setInterval(() => {
+        triggerElectricArc();
+    }, 4500);
+    
+    // Firework trails
+    setInterval(() => {
+        triggerFireworkTrail();
+    }, 6500);
+    
+    // Smoke puffs
+    setInterval(() => {
+        triggerSmokePuff();
+    }, 3000);
+    
+    // Crystal shards
+    setInterval(() => {
+        triggerCrystalShard();
+    }, 5000);
+    
+    // Energy spheres
+    setInterval(() => {
+        triggerEnergySphere();
+    }, 4000);
+    
+    // Warp speed effect
+    setInterval(() => {
+        if(Math.random() > 0.8) triggerWarpSpeed();
+    }, 8000);
+    
+    // Quantum particles
+    setInterval(() => {
+        triggerQuantumParticles();
+    }, 2500);
+    
+    // Nebula clouds
+    setInterval(() => {
+        triggerNebulaCloud();
+    }, 9000);
+    
+    // Satellite pass
+    setInterval(() => {
+        triggerSatellitePass();
+    }, 11000);
+    
+    // Comet streak
+    setInterval(() => {
+        triggerCometStreak();
+    }, 7500);
+}
+
+function triggerRandomSparkles() {
+    for(let i = 0; i < 10; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'auto-sparkle';
+        sparkle.style.left = Math.random() * 100 + '%';
+        sparkle.style.top = Math.random() * 100 + '%';
+        sparkle.textContent = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+        effectsContainer.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 3000);
+    }
+}
+
+function triggerEnergyPulse() {
+    const pulse = document.createElement('div');
+    pulse.className = 'energy-pulse';
+    pulse.style.left = Math.random() * 100 + '%';
+    pulse.style.top = Math.random() * 100 + '%';
+    effectsContainer.appendChild(pulse);
+    setTimeout(() => pulse.remove(), 2000);
+}
+
+function triggerPortalGlimpse() {
+    const portal = document.createElement('div');
+    portal.className = 'portal-glimpse';
+    portal.style.left = Math.random() * 80 + 10 + '%';
+    portal.style.top = Math.random() * 80 + 10 + '%';
+    effectsContainer.appendChild(portal);
+    setTimeout(() => portal.remove(), 3000);
+}
+
+function triggerRandomGlitch() {
+    const universe = document.querySelector('.contact-universe');
+    universe.classList.add('random-glitch');
+    setTimeout(() => universe.classList.remove('random-glitch'), 200);
+}
+
+function triggerShootingStar() {
+    const star = document.createElement('div');
+    star.className = 'shooting-star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 50 + '%';
+    effectsContainer.appendChild(star);
+    setTimeout(() => star.remove(), 2000);
+}
+
+function triggerCosmicDust() {
+    for(let i = 0; i < 20; i++) {
+        const dust = document.createElement('div');
+        dust.className = 'cosmic-dust';
+        dust.style.left = Math.random() * 100 + '%';
+        dust.style.animationDelay = Math.random() * 2 + 's';
+        effectsContainer.appendChild(dust);
+        setTimeout(() => dust.remove(), 5000);
+    }
+}
+
+function triggerFloatingOrb() {
+    const orb = document.createElement('div');
+    orb.className = 'floating-orb';
+    orb.style.left = Math.random() * 100 + '%';
+    orb.style.animationDuration = (Math.random() * 5 + 5) + 's';
+    orb.style.backgroundColor = getRandomColor();
+    effectsContainer.appendChild(orb);
+    setTimeout(() => orb.remove(), 10000);
+}
+
+function triggerLaserBeam() {
+    const laser = document.createElement('div');
+    laser.className = 'laser-beam';
+    laser.style.top = Math.random() * 100 + '%';
+    laser.style.backgroundColor = ['#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#00ffff'][Math.floor(Math.random() * 5)];
+    effectsContainer.appendChild(laser);
+    setTimeout(() => laser.remove(), 1000);
+}
+
+function triggerHologramEffect() {
+    const holo = document.createElement('div');
+    holo.className = 'hologram-effect';
+    holo.textContent = ['SYSTEM ONLINE', 'PROCESSING', 'DATA TRANSFER', 'QUANTUM SYNC'][Math.floor(Math.random() * 4)];
+    holo.style.left = Math.random() * 80 + 10 + '%';
+    holo.style.top = Math.random() * 80 + 10 + '%';
+    effectsContainer.appendChild(holo);
+    setTimeout(() => holo.remove(), 3000);
+}
+
+function triggerDimensionRift() {
+    const rift = document.createElement('div');
+    rift.className = 'dimension-rift';
+    rift.style.left = Math.random() * 80 + 10 + '%';
+    rift.style.top = Math.random() * 80 + 10 + '%';
+    effectsContainer.appendChild(rift);
+    setTimeout(() => rift.remove(), 2000);
+}
+
+// ============================================
+// MEGA ULTRA ANIMATIONS
+// ============================================
+
+function triggerSpiralVortex() {
+    const vortex = document.createElement('div');
+    vortex.className = 'spiral-vortex';
+    vortex.style.left = Math.random() * 80 + 10 + '%';
+    vortex.style.top = Math.random() * 80 + 10 + '%';
+    effectsContainer.appendChild(vortex);
+    setTimeout(() => vortex.remove(), 3000);
+}
+
+function triggerNeonTrail() {
+    const trail = document.createElement('div');
+    trail.className = 'neon-trail';
+    trail.style.top = Math.random() * 100 + '%';
+    trail.style.backgroundColor = getRandomColor();
+    effectsContainer.appendChild(trail);
+    setTimeout(() => trail.remove(), 2000);
+}
+
+function triggerParticleExplosion() {
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    for(let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'explosion-particle-burst';
+        particle.style.left = x + '%';
+        particle.style.top = y + '%';
+        const angle = (Math.PI * 2 * i) / 30;
+        particle.style.setProperty('--angle', angle + 'rad');
+        particle.style.backgroundColor = getRandomColor();
+        effectsContainer.appendChild(particle);
+        setTimeout(() => particle.remove(), 2000);
+    }
+}
+
+function triggerFloatingText() {
+    const texts = ['COSMIC', 'QUANTUM', 'NEBULA', 'GALAXY', 'VORTEX', 'PORTAL', 'DIMENSION', 'INFINITY'];
+    const text = document.createElement('div');
+    text.className = 'floating-text';
+    text.textContent = texts[Math.floor(Math.random() * texts.length)];
+    text.style.left = Math.random() * 80 + 10 + '%';
+    text.style.color = getRandomColor();
+    effectsContainer.appendChild(text);
+    setTimeout(() => text.remove(), 4000);
+}
+
+function triggerColorBomb() {
+    const bomb = document.createElement('div');
+    bomb.className = 'color-bomb';
+    bomb.style.left = Math.random() * 100 + '%';
+    bomb.style.top = Math.random() * 100 + '%';
+    bomb.style.background = `radial-gradient(circle, ${getRandomColor()}, transparent)`;
+    effectsContainer.appendChild(bomb);
+    setTimeout(() => bomb.remove(), 3000);
+}
+
+function triggerPlasmaWave() {
+    const wave = document.createElement('div');
+    wave.className = 'plasma-wave';
+    wave.style.left = Math.random() * 100 + '%';
+    effectsContainer.appendChild(wave);
+    setTimeout(() => wave.remove(), 4000);
+}
+
+function triggerDigitalRain() {
+    for(let i = 0; i < 15; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'digital-rain-drop';
+        drop.textContent = ['0', '1', '01', '10', '∞', '⚡', '✦', '◆'][Math.floor(Math.random() * 8)];
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        effectsContainer.appendChild(drop);
+        setTimeout(() => drop.remove(), 5000);
+    }
+}
+
+function triggerSpiralGalaxy() {
+    const galaxy = document.createElement('div');
+    galaxy.className = 'spiral-galaxy';
+    galaxy.style.left = Math.random() * 80 + 10 + '%';
+    galaxy.style.top = Math.random() * 80 + 10 + '%';
+    
+    for(let i = 0; i < 20; i++) {
+        const star = document.createElement('div');
+        star.className = 'galaxy-star';
+        star.style.setProperty('--delay', (i * 0.1) + 's');
+        galaxy.appendChild(star);
+    }
+    
+    effectsContainer.appendChild(galaxy);
+    setTimeout(() => galaxy.remove(), 5000);
+}
+
+function triggerNeonRings() {
+    const rings = document.createElement('div');
+    rings.className = 'neon-rings';
+    rings.style.left = Math.random() * 100 + '%';
+    rings.style.top = Math.random() * 100 + '%';
+    rings.innerHTML = '<div class="ring"></div><div class="ring"></div><div class="ring"></div>';
+    effectsContainer.appendChild(rings);
+    setTimeout(() => rings.remove(), 3000);
+}
+
+function triggerBubbleBurst() {
+    for(let i = 0; i < 10; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.left = Math.random() * 100 + '%';
+        bubble.style.animationDelay = Math.random() * 1 + 's';
+        bubble.style.width = bubble.style.height = (Math.random() * 50 + 20) + 'px';
+        effectsContainer.appendChild(bubble);
+        setTimeout(() => bubble.remove(), 4000);
+    }
+}
+
+function triggerElectricArc() {
+    const arc = document.createElement('div');
+    arc.className = 'electric-arc';
+    arc.style.left = Math.random() * 100 + '%';
+    arc.style.top = Math.random() * 80 + '%';
+    effectsContainer.appendChild(arc);
+    setTimeout(() => arc.remove(), 1000);
+}
+
+function triggerFireworkTrail() {
+    const trail = document.createElement('div');
+    trail.className = 'firework-trail';
+    trail.style.left = Math.random() * 100 + '%';
+    effectsContainer.appendChild(trail);
+    
+    setTimeout(() => {
+        for(let i = 0; i < 15; i++) {
+            const spark = document.createElement('div');
+            spark.className = 'trail-spark';
+            const angle = (Math.PI * 2 * i) / 15;
+            spark.style.setProperty('--angle', angle + 'rad');
+            spark.style.backgroundColor = getRandomColor();
+            trail.appendChild(spark);
+        }
+    }, 1000);
+    
+    setTimeout(() => trail.remove(), 3000);
+}
+
+function triggerSmokePuff() {
+    const puff = document.createElement('div');
+    puff.className = 'smoke-puff';
+    puff.style.left = Math.random() * 100 + '%';
+    effectsContainer.appendChild(puff);
+    setTimeout(() => puff.remove(), 3000);
+}
+
+function triggerCrystalShard() {
+    const shard = document.createElement('div');
+    shard.className = 'crystal-shard';
+    shard.style.left = Math.random() * 100 + '%';
+    shard.style.top = Math.random() * 80 + '%';
+    shard.style.transform = `rotate(${Math.random() * 360}deg)`;
+    shard.style.background = `linear-gradient(135deg, ${getRandomColor()}, transparent)`;
+    effectsContainer.appendChild(shard);
+    setTimeout(() => shard.remove(), 2000);
+}
+
+function triggerEnergySphere() {
+    const sphere = document.createElement('div');
+    sphere.className = 'energy-sphere';
+    sphere.style.left = Math.random() * 100 + '%';
+    sphere.style.top = Math.random() * 100 + '%';
+    sphere.style.background = `radial-gradient(circle, ${getRandomColor()}, transparent)`;
+    effectsContainer.appendChild(sphere);
+    setTimeout(() => sphere.remove(), 4000);
+}
+
+function triggerWarpSpeed() {
+    document.body.classList.add('warp-speed');
+    
+    for(let i = 0; i < 50; i++) {
+        const line = document.createElement('div');
+        line.className = 'warp-line';
+        line.style.top = Math.random() * 100 + '%';
+        line.style.animationDelay = Math.random() * 0.5 + 's';
+        effectsContainer.appendChild(line);
+        setTimeout(() => line.remove(), 2000);
+    }
+    
+    setTimeout(() => document.body.classList.remove('warp-speed'), 2000);
+}
+
+function triggerQuantumParticles() {
+    for(let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'quantum-particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        effectsContainer.appendChild(particle);
+        setTimeout(() => particle.remove(), 3000);
+    }
+}
+
+function triggerNebulaCloud() {
+    const nebula = document.createElement('div');
+    nebula.className = 'nebula-cloud';
+    nebula.style.left = Math.random() * 80 + '%';
+    nebula.style.top = Math.random() * 80 + '%';
+    nebula.style.background = `radial-gradient(circle, 
+        ${getRandomColor()}33, 
+        ${getRandomColor()}22, 
+        transparent)`;
+    effectsContainer.appendChild(nebula);
+    setTimeout(() => nebula.remove(), 6000);
+}
+
+function triggerSatellitePass() {
+    const satellite = document.createElement('div');
+    satellite.className = 'satellite';
+    satellite.textContent = '🛰️';
+    satellite.style.top = Math.random() * 50 + '%';
+    effectsContainer.appendChild(satellite);
+    setTimeout(() => satellite.remove(), 5000);
+}
+
+function triggerCometStreak() {
+    const comet = document.createElement('div');
+    comet.className = 'comet-streak';
+    comet.style.left = Math.random() * 50 + '%';
+    comet.style.top = Math.random() * 30 + '%';
+    effectsContainer.appendChild(comet);
+    setTimeout(() => comet.remove(), 3000);
+}
+
+// Add typing effects to all inputs
+document.querySelectorAll('.form-input').forEach(input => {
+    input.addEventListener('input', function(e) {
+        const currentLength = this.value.length;
+        const previousLength = lastInputLength[this.id] || 0;
+        
+        if (currentLength > previousLength) {
+            // Text added - MAXIMUM CHAOS
+            triggerFlyingObject();
+            triggerFlyingObject(); // Double spawn!
+            triggerTypingGlitch();
+            triggerSparkles(this);
+            triggerFloatingEmoji();
+            triggerLightningBolt();
+            if(Math.random() > 0.7) triggerDragon();
+            if(Math.random() > 0.8) triggerRainbowWave();
+        } else if (currentLength < previousLength) {
+            // Text deleted - ULTRA DESTRUCTION
+            triggerLaserEffect();
+            triggerDeleteGlitch();
+            triggerScreenShake();
+            triggerExplosion(this);
+            triggerFireworks();
+            triggerElectricShock();
+            triggerVortex();
+            triggerGlassShatters();
+        }
+        
+        lastInputLength[this.id] = currentLength;
+    });
+    
+    // Add focus effect - MEGA ENTRANCE
+    input.addEventListener('focus', function() {
+        triggerUFOSighting();
+        triggerPortalOpen(this);
+        triggerAngelWings(this);
+        triggerNeonBurst(this);
+    });
+    
+    // Add hover effect - Continuous particles
+    input.addEventListener('mouseenter', function() {
+        startContinuousParticles(this);
+    });
+    
+    input.addEventListener('mouseleave', function() {
+        stopContinuousParticles();
+    });
+    
+    // Keypress effects
+    input.addEventListener('keypress', function(e) {
+        triggerKeyPressRipple(this, e);
+    });
+});
+
+// Flying objects when typing
+function triggerFlyingObject() {
+    const objects = ['✈️', '🚁', '🛩️', '🚀', '🛸', '🦅', '🦋', '☄️', '💫', '⭐'];
+    const randomObject = objects[Math.floor(Math.random() * objects.length)];
+    
+    const flyingObj = document.createElement('div');
+    flyingObj.className = 'flying-object';
+    flyingObj.textContent = randomObject;
+    flyingObj.style.top = Math.random() * 80 + 10 + '%';
+    flyingObj.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
+    
+    effectsContainer.appendChild(flyingObj);
+    
+    setTimeout(() => flyingObj.remove(), 3000);
+}
+
+// UFO sighting on focus
+function triggerUFOSighting() {
+    const ufo = document.createElement('div');
+    ufo.className = 'ufo-sighting';
+    ufo.innerHTML = '🛸';
+    ufo.style.top = Math.random() * 60 + 20 + '%';
+    
+    effectsContainer.appendChild(ufo);
+    
+    // Add beam effect
+    const beam = document.createElement('div');
+    beam.className = 'ufo-beam';
+    beam.style.top = ufo.style.top;
+    effectsContainer.appendChild(beam);
+    
+    setTimeout(() => {
+        ufo.remove();
+        beam.remove();
+    }, 2000);
+}
+
+// Laser effect when deleting
+function triggerLaserEffect() {
+    const contactForm = document.querySelector('.contact-form');
+    const laser = document.createElement('div');
+    laser.className = 'laser-border';
+    
+    contactForm.appendChild(laser);
+    
+    // Add laser sound
+    playLaserSound();
+    
+    setTimeout(() => laser.remove(), 800);
+}
+
+// Screen shake when deleting
+function triggerScreenShake() {
+    const contactContainer = document.querySelector('.contact-container');
+    contactContainer.classList.add('shake-effect');
+    
+    setTimeout(() => {
+        contactContainer.classList.remove('shake-effect');
+    }, 500);
+}
+
+// Glitch effect when typing
+function triggerTypingGlitch() {
+    const universe = document.querySelector('.contact-universe');
+    universe.classList.add('typing-glitch');
+    
+    setTimeout(() => {
+        universe.classList.remove('typing-glitch');
+    }, 100);
+}
+
+// Intense glitch when deleting
+function triggerDeleteGlitch() {
+    const universe = document.querySelector('.contact-universe');
+    universe.classList.add('delete-glitch');
+    
+    setTimeout(() => {
+        universe.classList.remove('delete-glitch');
+    }, 300);
+}
+
+// Laser sound effect
+function playLaserSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+        oscillator.type = 'sawtooth';
+        
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch(e) {}
+}
+
+// Meteor shower effect
+function triggerMeteorShower() {
+    for(let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const meteor = document.createElement('div');
+            meteor.className = 'meteor';
+            meteor.style.left = Math.random() * 100 + '%';
+            meteor.style.animationDelay = Math.random() * 0.5 + 's';
+            effectsContainer.appendChild(meteor);
+            
+            setTimeout(() => meteor.remove(), 2000);
+        }, i * 200);
+    }
+}
+
+// Random cosmic events
+setInterval(() => {
+    if(Math.random() > 0.97) {
+        triggerMeteorShower();
+    }
+}, 2000);
+
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ path('app_contact') }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            showSuccessPopup();
+            this.reset();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showSuccessPopup(); // Show popup anyway for demo
+    });
+});
+
+function showSuccessPopup() {
+    const popup = document.getElementById('successPopup');
+    
+    // MEGA MEGA MEGA ANIMATION SEQUENCE!!!
+    triggerMegaValidationSequence();
+    
+    setTimeout(() => {
+        popup.classList.add('active');
+        
+        // Create confetti
+        createConfetti();
+        createMegaConfetti();
+        
+        // Add sound effect
+        playSuccessSound();
+        playVictoryFanfare();
+        
+        // Trigger meteor shower
+        triggerMeteorShower();
+        
+        // Animate elements
+        setTimeout(() => {
+            document.querySelector('.success-checkmark').classList.add('animate');
+        }, 300);
+    }, 5000); // Delay for mega animation
+}
+
+function closePopup() {
+    const popup = document.getElementById('successPopup');
+    popup.classList.remove('active');
+    document.querySelector('.success-checkmark').classList.remove('animate');
+}
+
+function createConfetti() {
+    const container = document.querySelector('.confetti-container');
+    container.innerHTML = '';
+    
+    for(let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.backgroundColor = getRandomColor();
+        container.appendChild(confetti);
+    }
+}
+
+function getRandomColor() {
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#00d2d3', '#ff9ff3'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function playSuccessSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+    } catch(e) {}
+}
+
+// Close popup when clicking outside
+document.getElementById('successPopup').addEventListener('click', function(e) {
+    if(e.target === this) {
+        closePopup();
+    }
+});
+
+// Add particle effect to button
+document.querySelector('.cosmic-button').addEventListener('mousemove', function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    
+    this.querySelector('.button-particles').appendChild(particle);
+    
+    setTimeout(() => particle.remove(), 1000);
+});
+
+// ============================================
+// MEGA ULTRA EFFECTS FUNCTIONS
+// ============================================
+
+function triggerMegaValidationSequence() {
+    const universe = document.querySelector('.contact-universe');
+    const form = document.querySelector('.contact-form');
+    
+    // Step 1: Warning siren
+    playWarningSiren();
+    triggerRedAlert();
+    
+    // Step 2: Screen flash
+    setTimeout(() => {
+        triggerScreenFlash();
+        playWhiteNoise();
+    }, 300);
+    
+    // Step 3: Time freeze effect
+    setTimeout(() => {
+        triggerTimeFreezeEffect();
+        playGlitchSound();
+    }, 500);
+    
+    // Step 4: Energy buildup EXTREME
+    setTimeout(() => {
+        triggerEnergyBuildup(form);
+        playEnergyChargeSound();
+        triggerScreenShakeExtreme();
+    }, 800);
+    
+    // Step 5: Critical mass
+    setTimeout(() => {
+        triggerCriticalMass();
+        playAlarmSound();
+    }, 1200);
+    
+    // Step 6: Portal opens
+    setTimeout(() => {
+        triggerDimensionalPortal();
+        playPortalSound();
+    }, 1500);
+    
+    // Step 7: NUCLEAR EXPLOSION
+    setTimeout(() => {
+        triggerNuclearExplosion();
+        playMassiveExplosion();
+        triggerScreenShakeChaos();
+    }, 2000);
+    
+    // Step 8: Shockwave devastation
+    setTimeout(() => {
+        triggerShockwaveBlast();
+        playShockwaveSound();
+    }, 2300);
+    
+    // Step 9: Reality shatter
+    setTimeout(() => {
+        triggerRealityShatter();
+        playGlassBreakSound();
+    }, 2700);
+    
+    // Step 10: Cosmic collapse
+    setTimeout(() => {
+        triggerCosmicCollapse();
+        playVortexSound();
+    }, 3200);
+    
+    // Step 11: Big Bang rebirth
+    setTimeout(() => {
+        triggerBigBang();
+        playBigBangSound();
+    }, 3800);
+    
+    // Step 12: Victory celebration MAXIMUM
+    setTimeout(() => {
+        triggerVictoryCelebration();
+        playVictoryFanfare();
+        triggerFireworksApocalypse();
+    }, 4500);
+}
+
+function triggerScreenFlash() {
+    const flash = document.createElement('div');
+    flash.className = 'screen-flash';
+    megaEffectsContainer.appendChild(flash);
+    setTimeout(() => flash.remove(), 500);
+}
+
+function triggerTimeFreezeEffect() {
+    document.body.classList.add('time-freeze');
+    setTimeout(() => document.body.classList.remove('time-freeze'), 800);
+}
+
+function triggerEnergyBuildup(element) {
+    const energy = document.createElement('div');
+    energy.className = 'energy-buildup';
+    element.appendChild(energy);
+    
+    // Create multiple energy orbs
+    for(let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const orb = document.createElement('div');
+            orb.className = 'energy-orb';
+            orb.style.left = Math.random() * 100 + '%';
+            orb.style.top = Math.random() * 100 + '%';
+            megaEffectsContainer.appendChild(orb);
+            setTimeout(() => orb.remove(), 2000);
+        }, i * 50);
+    }
+}
+
+function triggerDimensionalPortal() {
+    const portal = document.createElement('div');
+    portal.className = 'dimensional-portal';
+    portal.innerHTML = '<div class="portal-ring"></div><div class="portal-ring"></div><div class="portal-ring"></div>';
+    megaEffectsContainer.appendChild(portal);
+    
+    playPortalSound();
+    
+    setTimeout(() => portal.remove(), 3000);
+}
+
+function triggerCosmicExplosion() {
+    const explosion = document.createElement('div');
+    explosion.className = 'cosmic-explosion';
+    megaEffectsContainer.appendChild(explosion);
+    
+    // Create shockwave
+    const shockwave = document.createElement('div');
+    shockwave.className = 'shockwave';
+    megaEffectsContainer.appendChild(shockwave);
+    
+    // Create particle burst
+    for(let i = 0; i < 100; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            particle.className = 'explosion-particle';
+            const angle = (Math.PI * 2 * i) / 100;
+            particle.style.setProperty('--angle', angle + 'rad');
+            particle.style.backgroundColor = getRandomColor();
+            megaEffectsContainer.appendChild(particle);
+            setTimeout(() => particle.remove(), 2000);
+        }, i * 10);
+    }
+    
+    playExplosionSound();
+    
+    setTimeout(() => {
+        explosion.remove();
+        shockwave.remove();
+    }, 2000);
+}
+
+function triggerRealityWarp() {
+    document.body.classList.add('reality-warp');
+    setTimeout(() => document.body.classList.remove('reality-warp'), 1000);
+}
+
+function triggerVictoryCelebration() {
+    // Fireworks everywhere
+    for(let i = 0; i < 10; i++) {
+        setTimeout(() => triggerFireworks(), i * 200);
+    }
+    
+    // Rainbow waves
+    for(let i = 0; i < 5; i++) {
+        setTimeout(() => triggerRainbowWave(), i * 300);
+    }
+    
+    // Star burst
+    triggerStarBurst();
+}
+
+function triggerSparkles(element) {
+    const rect = element.getBoundingClientRect();
+    for(let i = 0; i < 5; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = rect.left + Math.random() * rect.width + 'px';
+        sparkle.style.top = rect.top + Math.random() * rect.height + 'px';
+        sparkle.textContent = '✨';
+        effectsContainer.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 1000);
+    }
+}
+
+function triggerFloatingEmoji() {
+    const emojis = ['🎉', '🎊', '🌟', '⭐', '💫', '✨', '🎆', '🎇', '🌠', '💥'];
+    const emoji = document.createElement('div');
+    emoji.className = 'floating-emoji';
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.left = Math.random() * 100 + '%';
+    effectsContainer.appendChild(emoji);
+    setTimeout(() => emoji.remove(), 3000);
+}
+
+function triggerLightningBolt() {
+    const lightning = document.createElement('div');
+    lightning.className = 'lightning-bolt';
+    lightning.style.left = Math.random() * 100 + '%';
+    effectsContainer.appendChild(lightning);
+    playThunderSound();
+    setTimeout(() => lightning.remove(), 500);
+}
+
+function triggerDragon() {
+    const dragon = document.createElement('div');
+    dragon.className = 'dragon';
+    dragon.textContent = '🐉';
+    dragon.style.top = Math.random() * 60 + 20 + '%';
+    effectsContainer.appendChild(dragon);
+    setTimeout(() => dragon.remove(), 4000);
+}
+
+function triggerRainbowWave() {
+    const wave = document.createElement('div');
+    wave.className = 'rainbow-wave';
+    effectsContainer.appendChild(wave);
+    setTimeout(() => wave.remove(), 2000);
+}
+
+function triggerExplosion(element) {
+    const rect = element.getBoundingClientRect();
+    const explosion = document.createElement('div');
+    explosion.className = 'mini-explosion';
+    explosion.style.left = rect.left + rect.width/2 + 'px';
+    explosion.style.top = rect.top + rect.height/2 + 'px';
+    explosion.textContent = '💥';
+    effectsContainer.appendChild(explosion);
+    setTimeout(() => explosion.remove(), 1000);
+}
+
+function triggerElectricShock() {
+    const form = document.querySelector('.contact-form');
+    form.classList.add('electric-shock');
+    setTimeout(() => form.classList.remove('electric-shock'), 300);
+}
+
+function triggerVortex() {
+    const vortex = document.createElement('div');
+    vortex.className = 'vortex';
+    effectsContainer.appendChild(vortex);
+    setTimeout(() => vortex.remove(), 1500);
+}
+
+function triggerGlassShatters() {
+    for(let i = 0; i < 15; i++) {
+        const shard = document.createElement('div');
+        shard.className = 'glass-shard';
+        shard.style.left = Math.random() * 100 + '%';
+        shard.style.top = Math.random() * 100 + '%';
+        shard.style.setProperty('--tx', (Math.random() - 0.5) * 500 + 'px');
+        shard.style.setProperty('--ty', Math.random() * 500 + 200 + 'px');
+        effectsContainer.appendChild(shard);
+        setTimeout(() => shard.remove(), 2000);
+    }
+}
+
+function triggerPortalOpen(element) {
+    const rect = element.getBoundingClientRect();
+    const portal = document.createElement('div');
+    portal.className = 'mini-portal';
+    portal.style.left = rect.left + rect.width/2 + 'px';
+    portal.style.top = rect.top + rect.height/2 + 'px';
+    effectsContainer.appendChild(portal);
+    setTimeout(() => portal.remove(), 2000);
+}
+
+function triggerAngelWings(element) {
+    const rect = element.getBoundingClientRect();
+    const wings = document.createElement('div');
+    wings.className = 'angel-wings';
+    wings.innerHTML = '👼';
+    wings.style.left = rect.left + rect.width/2 + 'px';
+    wings.style.top = rect.top + 'px';
+    effectsContainer.appendChild(wings);
+    setTimeout(() => wings.remove(), 2000);
+}
+
+function triggerNeonBurst(element) {
+    const rect = element.getBoundingClientRect();
+    for(let i = 0; i < 8; i++) {
+        const burst = document.createElement('div');
+        burst.className = 'neon-burst';
+        burst.style.left = rect.left + rect.width/2 + 'px';
+        burst.style.top = rect.top + rect.height/2 + 'px';
+        burst.style.transform = `rotate(${i * 45}deg)`;
+        effectsContainer.appendChild(burst);
+        setTimeout(() => burst.remove(), 1000);
+    }
+}
+
+function triggerKeyPressRipple(element, event) {
+    const ripple = document.createElement('div');
+    ripple.className = 'key-ripple';
+    ripple.textContent = event.key;
+    ripple.style.left = event.clientX + 'px';
+    ripple.style.top = event.clientY + 'px';
+    effectsContainer.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 1000);
+}
+
+function startContinuousParticles(element) {
+    const rect = element.getBoundingClientRect();
+    particleInterval = setInterval(() => {
+        const particle = document.createElement('div');
+        particle.className = 'hover-particle';
+        particle.style.left = rect.left + Math.random() * rect.width + 'px';
+        particle.style.top = rect.top + rect.height + 'px';
+        effectsContainer.appendChild(particle);
+        setTimeout(() => particle.remove(), 2000);
+    }, 100);
+}
+
+function stopContinuousParticles() {
+    if(particleInterval) {
+        clearInterval(particleInterval);
+        particleInterval = null;
+    }
+}
+
+function triggerStarBurst() {
+    for(let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.className = 'star-burst';
+            star.textContent = '⭐';
+            star.style.left = 50 + '%';
+            star.style.top = 50 + '%';
+            const angle = (Math.PI * 2 * i) / 50;
+            star.style.setProperty('--angle', angle + 'rad');
+            megaEffectsContainer.appendChild(star);
+            setTimeout(() => star.remove(), 2000);
+        }, i * 20);
+    }
+}
+
+function createMegaConfetti() {
+    for(let i = 0; i < 200; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'mega-confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            confetti.style.backgroundColor = getRandomColor();
+            confetti.textContent = ['🎉', '🎊', '⭐', '✨', '💫'][Math.floor(Math.random() * 5)];
+            megaEffectsContainer.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 5000);
+        }, i * 15);
+    }
+}
+
+function playPortalSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+}
+
+function playExplosionSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+function playThunderSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+    } catch(e) {}
+}
+
+function playVictoryFanfare() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, C
+        notes.forEach((freq, i) => {
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            }, i * 150);
+        });
+    } catch(e) {}
+}
+
+// ============================================
+// APOCALYPTIC EFFECTS
+// ============================================
+
+function triggerRedAlert() {
+    const alert = document.createElement('div');
+    alert.className = 'red-alert';
+    megaEffectsContainer.appendChild(alert);
+    setTimeout(() => alert.remove(), 5000);
+}
+
+function triggerScreenShakeExtreme() {
+    document.body.classList.add('shake-extreme');
+    setTimeout(() => document.body.classList.remove('shake-extreme'), 1000);
+}
+
+function triggerScreenShakeChaos() {
+    document.body.classList.add('shake-chaos');
+    setTimeout(() => document.body.classList.remove('shake-chaos'), 2000);
+}
+
+function triggerCriticalMass() {
+    const critical = document.createElement('div');
+    critical.className = 'critical-mass';
+    critical.innerHTML = '<div class="warning-text">⚠️ CRITICAL MASS DETECTED ⚠️</div>';
+    megaEffectsContainer.appendChild(critical);
+    setTimeout(() => critical.remove(), 800);
+}
+
+function triggerNuclearExplosion() {
+    const nuke = document.createElement('div');
+    nuke.className = 'nuclear-explosion';
+    megaEffectsContainer.appendChild(nuke);
+    
+    // Multiple shockwaves
+    for(let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const wave = document.createElement('div');
+            wave.className = 'mega-shockwave';
+            megaEffectsContainer.appendChild(wave);
+            setTimeout(() => wave.remove(), 3000);
+        }, i * 200);
+    }
+    
+    // Debris explosion
+    for(let i = 0; i < 200; i++) {
+        setTimeout(() => {
+            const debris = document.createElement('div');
+            debris.className = 'debris';
+            const angle = (Math.PI * 2 * i) / 200;
+            debris.style.setProperty('--angle', angle + 'rad');
+            debris.style.backgroundColor = ['#ff0000', '#ff6600', '#ffff00', '#ffffff'][Math.floor(Math.random() * 4)];
+            megaEffectsContainer.appendChild(debris);
+            setTimeout(() => debris.remove(), 3000);
+        }, i * 5);
+    }
+    
+    setTimeout(() => nuke.remove(), 3000);
+}
+
+function triggerShockwaveBlast() {
+    document.body.classList.add('shockwave-impact');
+    setTimeout(() => document.body.classList.remove('shockwave-impact'), 1000);
+    
+    // Create dust clouds
+    for(let i = 0; i < 30; i++) {
+        const dust = document.createElement('div');
+        dust.className = 'dust-cloud';
+        dust.style.left = Math.random() * 100 + '%';
+        dust.style.animationDelay = Math.random() * 0.5 + 's';
+        megaEffectsContainer.appendChild(dust);
+        setTimeout(() => dust.remove(), 3000);
+    }
+}
+
+function triggerRealityShatter() {
+    const container = document.createElement('div');
+    container.className = 'reality-shatter';
+    
+    // Create crack pattern
+    for(let i = 0; i < 50; i++) {
+        const crack = document.createElement('div');
+        crack.className = 'reality-crack';
+        crack.style.left = Math.random() * 100 + '%';
+        crack.style.top = Math.random() * 100 + '%';
+        crack.style.transform = `rotate(${Math.random() * 360}deg)`;
+        container.appendChild(crack);
+    }
+    
+    megaEffectsContainer.appendChild(container);
+    setTimeout(() => container.remove(), 2000);
+}
+
+function triggerCosmicCollapse() {
+    const collapse = document.createElement('div');
+    collapse.className = 'cosmic-collapse';
+    megaEffectsContainer.appendChild(collapse);
+    
+    document.body.classList.add('being-sucked');
+    setTimeout(() => {
+        document.body.classList.remove('being-sucked');
+        collapse.remove();
+    }, 1500);
+}
+
+function triggerBigBang() {
+    const bigbang = document.createElement('div');
+    bigbang.className = 'big-bang';
+    megaEffectsContainer.appendChild(bigbang);
+    
+    // Color explosion in all directions
+    for(let i = 0; i < 100; i++) {
+        setTimeout(() => {
+            const ray = document.createElement('div');
+            ray.className = 'big-bang-ray';
+            const angle = (Math.PI * 2 * i) / 100;
+            ray.style.setProperty('--angle', angle + 'rad');
+            ray.style.background = `hsl(${i * 3.6}, 100%, 50%)`;
+            megaEffectsContainer.appendChild(ray);
+            setTimeout(() => ray.remove(), 2000);
+        }, i * 5);
+    }
+    
+    setTimeout(() => bigbang.remove(), 2000);
+}
+
+function triggerFireworksApocalypse() {
+    for(let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const fw = document.createElement('div');
+            fw.className = 'mega-firework';
+            fw.style.left = Math.random() * 100 + '%';
+            fw.style.top = Math.random() * 100 + '%';
+            megaEffectsContainer.appendChild(fw);
+            
+            // Firework burst
+            for(let j = 0; j < 20; j++) {
+                const spark = document.createElement('div');
+                spark.className = 'firework-spark';
+                const angle = (Math.PI * 2 * j) / 20;
+                spark.style.setProperty('--angle', angle + 'rad');
+                spark.style.backgroundColor = getRandomColor();
+                fw.appendChild(spark);
+            }
+            
+            setTimeout(() => fw.remove(), 2000);
+        }, i * 100);
+    }
+}
+
+// ============================================
+// INSANE SOUND EFFECTS
+// ============================================
+
+function playWarningSiren() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'square';
+        
+        // Oscillating siren - INFINITE
+        let freq = 800;
+        let direction = -1;
+        setInterval(() => {
+            freq += direction * 20;
+            if(freq <= 400) direction = 1;
+            if(freq >= 800) direction = -1;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        }, 50);
+        
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        osc.start();
+        // NO STOP - infinite!
+    } catch(e) {}
+}
+
+function playWhiteNoise() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create continuous noise generator
+        const bufferSize = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        for(let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        
+        const noise = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        noise.buffer = buffer;
+        noise.loop = true; // INFINITE LOOP!
+        noise.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        noise.start();
+        // NO STOP - infinite!
+    } catch(e) {}
+}
+
+function playGlitchSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Infinite glitch loop
+        setInterval(() => {
+            for(let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'square';
+                    osc.frequency.value = Math.random() * 1000 + 100;
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                }, i * 50);
+            }
+        }, 300); // Repeat every 300ms - INFINITE!
+    } catch(e) {}
+}
+
+function playEnergyChargeSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        
+        // Infinite energy charge cycle
+        let freq = 50;
+        let charging = true;
+        setInterval(() => {
+            if(charging) {
+                freq += 30;
+                if(freq >= 2000) charging = false;
+            } else {
+                freq -= 30;
+                if(freq <= 50) charging = true;
+            }
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        }, 50);
+        
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        osc.start();
+        // NO STOP - infinite!
+    } catch(e) {}
+}
+
+function playAlarmSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Infinite alarm beeps
+        setInterval(() => {
+            for(let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'square';
+                    osc.frequency.value = 1000;
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                }, i * 100);
+            }
+        }, 500); // Repeat every 500ms - INFINITE!
+    } catch(e) {}
+}
+
+function playMassiveExplosion() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Continuous bass rumble
+        const bass = ctx.createOscillator();
+        const bassGain = ctx.createGain();
+        bass.connect(bassGain);
+        bassGain.connect(ctx.destination);
+        bass.type = 'sine';
+        bass.frequency.setValueAtTime(40, ctx.currentTime);
+        bassGain.gain.setValueAtTime(0.4, ctx.currentTime);
+        bass.start();
+        // NO STOP - infinite bass!
+        
+        // Pulsating mid frequency
+        const mid = ctx.createOscillator();
+        const midGain = ctx.createGain();
+        mid.connect(midGain);
+        midGain.connect(ctx.destination);
+        mid.type = 'sawtooth';
+        mid.frequency.setValueAtTime(80, ctx.currentTime);
+        midGain.gain.setValueAtTime(0.3, ctx.currentTime);
+        mid.start();
+        // NO STOP - infinite!
+        
+        // Random rumble bursts
+        setInterval(() => {
+            const rumble = ctx.createOscillator();
+            const rumbleGain = ctx.createGain();
+            rumble.connect(rumbleGain);
+            rumbleGain.connect(ctx.destination);
+            rumble.type = 'sawtooth';
+            rumble.frequency.value = Math.random() * 100 + 30;
+            rumbleGain.gain.setValueAtTime(0.3, ctx.currentTime);
+            rumbleGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            rumble.start();
+            rumble.stop(ctx.currentTime + 0.2);
+        }, 150); // Continuous rumbles!
+    } catch(e) {}
+}
+
+function playShockwaveSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.8);
+        gain.gain.setValueAtTime(0.6, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.8);
+    } catch(e) {}
+}
+
+function playGlassBreakSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        for(let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'triangle';
+                osc.frequency.value = Math.random() * 3000 + 1000;
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            }, i * 30);
+        }
+    } catch(e) {}
+}
+
+function playVortexSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        
+        // Infinite spiral down and up
+        let freq = 1000;
+        let direction = -1;
+        setInterval(() => {
+            freq += direction * 25;
+            if(freq <= 100) direction = 1;
+            if(freq >= 1000) direction = -1;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        }, 30);
+        
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        osc.start();
+        // NO STOP - infinite!
+    } catch(e) {}
+}
+
+function playBigBangSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Multiple infinite layers
+        for(let i = 0; i < 5; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = ['sine', 'square', 'sawtooth', 'triangle', 'sine'][i];
+            
+            // Each layer oscillates at different rates
+            let freq = 100 * (i + 1);
+            let rising = true;
+            setInterval(() => {
+                if(rising) {
+                    freq += 20 * (i + 1);
+                    if(freq >= 2000 * (i + 1)) rising = false;
+                } else {
+                    freq -= 20 * (i + 1);
+                    if(freq <= 100 * (i + 1)) rising = true;
+                }
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            }, 50 + i * 10);
+            
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            osc.start();
+            // NO STOP - infinite layers!
+        }
+    } catch(e) {}
+}
+</script>
+{% endblock %}
