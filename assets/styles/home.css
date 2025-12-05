@@ -4,28 +4,52 @@
     align-items: center;
     justify-content: space-between;
     padding: 4rem 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f1b3c 100%);
+    color: #0f0;
     min-height: 400px;
     gap: 3rem;
+    position: relative;
+    border-bottom: 3px solid #0f0;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 100, 0.1) 0%, transparent 50%),
+        linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .hero-content {
     flex: 1;
     max-width: 600px;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-title {
     font-size: 3.5rem;
     margin-bottom: 1rem;
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    color: #0f0;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 2px 2px 4px rgba(0,0,0,0.3);
+    font-family: 'Courier New', monospace;
 }
 
 .hero-subtitle {
     font-size: 1.5rem;
     margin-bottom: 2rem;
-    opacity: 0.95;
+    color: #0f0;
+    opacity: 0.85;
+    font-family: 'Courier New', monospace;
 }
 
 .hero-buttons {
@@ -38,6 +62,8 @@
     flex: 0 0 280px;
     text-align: center;
     overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-image img {
@@ -51,60 +77,83 @@
     display: inline-block;
     padding: 1rem 2rem;
     text-decoration: none;
-    border-radius: 50px;
+    border-radius: 5px;
     font-weight: bold;
     font-size: 1.1rem;
     transition: all 0.3s ease;
     cursor: pointer;
+    font-family: 'Courier New', monospace;
 }
 
 .btn-primary {
-    background-color: #ff6b6b;
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    background-color: rgba(0, 255, 0, 0.1);
+    color: #0f0;
+    border: 2px solid #0f0;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
 }
 
 .btn-primary:hover {
-    background-color: #ff5252;
+    background-color: rgba(0, 255, 0, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
 }
 
 .btn-secondary {
     background-color: transparent;
-    color: white;
-    border: 2px solid white;
+    color: #0f0;
+    border: 2px solid #0f0;
 }
 
 .btn-secondary:hover {
-    background-color: white;
-    color: #667eea;
+    background-color: rgba(0, 255, 0, 0.1);
+    color: #0f0;
     transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
 }
 
 .btn-cta {
-    background-color: white;
-    color: #667eea;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #0f0;
+    border: 2px solid #0f0;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
 }
 
 .btn-cta:hover {
-    background-color: #f0f0f0;
+    background-color: rgba(0, 255, 0, 0.1);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
 }
 
 /* Features Section */
 .features {
     padding: 5rem 2rem;
-    background-color: #f8f9fa;
+    background: linear-gradient(to bottom, #0a0e27 0%, #1a1a3e 100%);
+    position: relative;
+}
+
+.features::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px, 50px 50px;
+    pointer-events: none;
 }
 
 .section-title {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;
-    color: #2c3e50;
+    color: #0f0;
+    text-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    font-family: 'Courier New', monospace;
+    position: relative;
+    z-index: 1;
 }
 
 .features-grid {
@@ -113,60 +162,95 @@
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .feature-card {
-    background: white;
+    background: rgba(0, 20, 0, 0.8);
     padding: 2rem;
+    border: 2px solid #0f0;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .feature-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    border-color: #0ff;
 }
 
 .feature-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
 }
 
 .feature-card h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    color: #2c3e50;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
 }
 
 .feature-card p {
-    color: #666;
+    color: #0f0;
     line-height: 1.6;
+    opacity: 0.8;
+    font-family: 'Courier New', monospace;
 }
 
 /* Call to Action Section */
 .cta {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    color: white;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+    color: #0f0;
     padding: 5rem 2rem;
     text-align: center;
+    border-top: 3px solid #0f0;
+    position: relative;
+}
+
+.cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(0, 255, 100, 0.1) 0%, transparent 50%),
+        linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+    pointer-events: none;
 }
 
 .cta-content {
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .cta h2 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    color: #0f0;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+    font-family: 'Courier New', monospace;
 }
 
 .cta p {
     font-size: 1.2rem;
     margin-bottom: 2rem;
-    opacity: 0.95;
+    color: #0f0;
+    opacity: 0.85;
+    font-family: 'Courier New', monospace;
 }
 
 /* Responsive Design */
@@ -195,5 +279,9 @@
 
     .cta h2 {
         font-size: 2rem;
+    }
+
+    .hero-image {
+        flex: 0 0 200px;
     }
 }

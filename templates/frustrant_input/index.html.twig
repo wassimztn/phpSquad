@@ -2,6 +2,39 @@
 
 {% block title %}Champ de saisie volontairement frustrant{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/frustrant.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f1b3c 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 100, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(0, 255, 100, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        main {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 <div class="frustrant-container">
     <h1>Entrez votre date de naissance (JJMMYYYY) 🎂</h1>
@@ -149,11 +182,6 @@
     ];
 </script>
 
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('styles/frustrant.css') }}">
 {% endblock %}
 
 {% block javascripts %}
