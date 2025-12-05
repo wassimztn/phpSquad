@@ -59,9 +59,17 @@ class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'app_login')]
-    public function login(): Response
+    public function login(SessionInterface $session): Response
     {
-        return $this->render('auth/login.html.twig');
+        // Récupérer le message d'authentification si présent
+        $authMessage = $session->get('auth_message');
+        if ($authMessage) {
+            $session->remove('auth_message');
+        }
+        
+        return $this->render('auth/login.html.twig', [
+            'auth_message' => $authMessage
+        ]);
     }
 
     #[Route('/login/verify', name: 'app_login_verify', methods: ['POST'])]

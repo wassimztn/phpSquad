@@ -621,6 +621,12 @@
         <h1 class="auth-title">🎮 CONNEXION</h1>
         <p class="auth-subtitle">Entrez votre combo secret !</p>
         
+        {% if auth_message %}
+        <div class="alert alert-warning" style="background: rgba(255, 165, 0, 0.2); border: 2px solid #ff0; color: #ff0; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; animation: pulse 2s ease-in-out;">
+            ⚠️ {{ auth_message }}
+        </div>
+        {% endif %}
+        
         <form id="loginForm">
             <div class="form-group">
                 <label class="form-label">📧 Email</label>
